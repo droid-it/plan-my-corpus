@@ -1,0 +1,39 @@
+# Gradle
+.gradle/
+build/
+**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# IDEA
+.idea/*
+!.idea/runConfigurations/
+!.idea/codeStyles/
+!.idea/gradle.xml
+!.idea/misc.xml
+!.idea/compiler.xml
+*.iml
+*.ipr
+*.iws
+out/
+
+# macOS
+.DS_Store
+
+# Kotlin
+*.class
+*.jar
+*.kotlin_module
+
+# Compose
+composeResources/
+
+# Node (for web builds)
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+webpack/
+kotlin-js-store/

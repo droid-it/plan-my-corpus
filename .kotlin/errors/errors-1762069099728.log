@@ -1,0 +1,181 @@
+kotlin version: 2.0.21
+error message: org.jetbrains.kotlin.backend.common.CompilationException: Back-end: Please report this problem https://kotl.in/issue
+/home/teamcity/agent/work/8a20760945d0aeba/compose/runtime/runtime/src/commonMain/kotlin/androidx/compose/runtime/snapshots/SnapshotStateMap.kt:289:1
+Problem with `private abstract class StateMapMutableIterator<K : Any?, V : Any?> {
+  constructor(map: SnapshotStateMap<K, V>, iterator: Iterator<Entry<K, V>>) /* primary */ {
+    super/*Any*/()
+    /* <init>() */
+
+  }
+
+  val map: SnapshotStateMap<K, V>
+    field = map
+    get
+
+  val iterator: Iterator<Entry<K, V>>
+    field = iterator
+    get
+
+  protected var modification: Int
+    field = <this>.<get-map>().<get-modification>()
+    protected get
+    protected set
+
+  protected var current: Entry<K, V>?
+    field = null
+    protected get
+    protected set
+
+  protected var next: Entry<K, V>?
+    field = null
+    protected get
+    protected set
+
+  init {
+    <this>.advance()
+  }
+
+  fun remove() {
+    return { // RETURNABLE BLOCK
+      { // INLINED FUNCTION BLOCK
+        // COMPOSITE {
+        val this: StateMapMutableIterator<K, V> = { // BLOCK
+          <this>
+        }
+        // }
+        when {
+          EQEQ(arg0 = this.<get-map>().<get-modification>(), arg1 = this.<get-modification>()).not() -> { // BLOCK
+            throw ConcurrentModificationException()
+          }
+        }
+        return { // RETURNABLE BLOCK
+          { // INLINED FUNCTION BLOCK
+            // COMPOSITE {
+            val this: Any? = { // BLOCK
+              { // RETURNABLE BLOCK
+                { // INLINED FUNCTION BLOCK
+                  val value: Entry<K, V>? = <this>.<get-current>()
+                  when {
+                    EQEQ(arg0 = value, arg1 = null).not() -> { // BLOCK
+                      <this>.<get-map>().remove(key = value.<get-key>()) /*~> Unit */
+                      <this>.<set-current>(<set-?> = null)
+                    }
+                    true -> { // BLOCK
+                      throw IllegalStateException()
+                    }
+                  }
+                }
+              }
+            }
+            // }
+            { // RETURNABLE BLOCK
+              { // INLINED FUNCTION BLOCK
+              }
+            }
+            { // RETURNABLE BLOCK
+              { // INLINED FUNCTION BLOCK
+                // COMPOSITE {
+                val it: Any? = { // BLOCK
+                  this
+                }
+                // }
+                this.<set-modification>(<set-?> = this.<get-map>().<get-modification>())
+              }
+            }
+            return this /*as Any? */
+          }
+        } /*as Unit */
+      }
+    }
+  }
+
+  fun hasNext(): Boolean {
+    return EQEQ(arg0 = <this>.<get-next>(), arg1 = null).not()
+  }
+
+  protected fun advance() {
+    <this>.<set-current>(<set-?> = <this>.<get-next>())
+    <this>.<set-next>(<set-?> = when {
+      <this>.<get-iterator>().hasNext() -> <this>.<get-iterator>().next()
+      true -> null
+    })
+  }
+
+  protected inline fun <T : Any?> modify(block: Function0<T>): T {
+    when {
+      EQEQ(arg0 = <this>.<get-map>().<get-modification>(), arg1 = <this>.<get-modification>()).not() -> { // BLOCK
+        throw ConcurrentModificationException()
+      }
+    }
+    return { // RETURNABLE BLOCK
+      { // INLINED FUNCTION BLOCK
+        // COMPOSITE {
+        val this: Any? = { // BLOCK
+          block.invoke()
+        }
+        // }
+        { // RETURNABLE BLOCK
+          { // INLINED FUNCTION BLOCK
+          }
+        }
+        { // RETURNABLE BLOCK
+          { // INLINED FUNCTION BLOCK
+            // COMPOSITE {
+            val it: T = { // BLOCK
+              this
+            }
+            // }
+            <this>.<set-modification>(<set-?> = <this>.<get-map>().<get-modification>())
+          }
+        }
+        return this /*as T */
+      }
+    }
+  }
+
+  /* fake */ override operator fun equals(other: Any?): Boolean
+
+  /* fake */ override fun hashCode(): Int
+
+  /* fake */ override fun toString(): String
+
+}
+
+`
+Details: Internal error in declaration transformer: java.lang.OutOfMemoryError: Java heap space
+	at java.base/java.util.ArrayList.iterator(ArrayList.java:947)
+	at org.jetbrains.kotlin.backend.common.DeclarationTransformer$Visitor.visitFunction(Lower.kt:250)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid$DefaultImpls.visitConstructor(IrElementVisitorVoid.kt:80)
+	at org.jetbrains.kotlin.backend.common.DeclarationTransformer$Visitor.visitConstructor(Lower.kt:242)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid$DefaultImpls.visitConstructor(IrElementVisitorVoid.kt:76)
+	at org.jetbrains.kotlin.backend.common.DeclarationTransformer$Visitor.visitConstructor(Lower.kt:242)
+	at org.jetbrains.kotlin.backend.common.DeclarationTransformer$Visitor.visitConstructor(Lower.kt:242)
+	at org.jetbrains.kotlin.ir.declarations.IrConstructor.accept(IrConstructor.kt:28)
+	at org.jetbrains.kotlin.backend.common.DeclarationTransformer$Visitor.visitClass(Lower.kt:293)
+	at org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid$DefaultImpls.visitClass(IrElementVisitorVoid.kt:44)
+	at org.jetbrains.kotlin.backend.common.DeclarationTransformer$Visitor.visitClass(Lower.kt:242)
+	at org.jetbrains.kotlin.backend.common.DeclarationTransformer$Visitor.visitClass(Lower.kt:242)
+	at org.jetbrains.kotlin.ir.declarations.IrClass.accept(IrClass.kt:72)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorsKt.acceptVoid(IrVisitors.kt:11)
+	at org.jetbrains.kotlin.backend.common.DeclarationTransformer.lower(Lower.kt:221)
+	at org.jetbrains.kotlin.backend.common.FileLoweringPass.lower(Lower.kt:42)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt.makeIrModulePhase$lambda$5(PhaseBuilders.kt:110)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt$$Lambda$1083/0x000000700175a928.invoke(Unknown Source)
+	at org.jetbrains.kotlin.backend.common.phaser.PhaseBuildersKt$createSimpleNamedCompilerPhase$1.phaseBody(PhaseBuilders.kt:69)
+	at org.jetbrains.kotlin.backend.common.phaser.SimpleNamedCompilerPhase.phaseBody(CompilerPhase.kt:226)
+	at org.jetbrains.kotlin.backend.common.phaser.AbstractNamedCompilerPhase.invoke(CompilerPhase.kt:113)
+	at org.jetbrains.kotlin.backend.wasm.WasmCompilerKt.compileToLoweredIr(wasmCompiler.kt:108)
+	at org.jetbrains.kotlin.cli.js.K2JsIrCompiler.doExecute(K2JsIrCompiler.kt:410)
+	at org.jetbrains.kotlin.cli.js.K2JSCompiler.doExecute(K2JSCompiler.java:70)
+	at org.jetbrains.kotlin.cli.js.K2JSCompiler.doExecute(K2JSCompiler.java:33)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:103)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:49)
+	at org.jetbrains.kotlin.cli.common.CLITool.exec(CLITool.kt:101)
+	at org.jetbrains.kotlin.daemon.CompileServiceImpl.compile(CompileServiceImpl.kt:1555)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+Caused by: java.lang.OutOfMemoryError: Java heap space
+	... 32 more
+
+
