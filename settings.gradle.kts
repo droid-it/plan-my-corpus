@@ -1,4 +1,4 @@
-rootProject.name = "financial-planner"
+rootProject.name = "plan-my-corpus"
 
 pluginManagement {
     repositories {

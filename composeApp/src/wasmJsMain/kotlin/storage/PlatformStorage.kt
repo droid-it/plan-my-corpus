@@ -23,4 +23,12 @@ actual object PlatformStorage : StorageManager {
     override fun uploadJson(onFileLoaded: (String) -> Unit) {
         WebStorage.uploadJson(onFileLoaded)
     }
+
+    override fun saveUIPreference(key: String, value: String) {
+        WebStorage.saveUIPreference(key, value)
+    }
+
+    override fun loadUIPreference(key: String): String? {
+        return WebStorage.loadUIPreference(key)
+    }
 }

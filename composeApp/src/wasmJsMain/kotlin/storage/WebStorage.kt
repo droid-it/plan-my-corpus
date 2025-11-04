@@ -1,6 +1,7 @@
 package storage
 
-private const val STORAGE_KEY = "financial_planner_data"
+private const val STORAGE_KEY = "plan_my_corpus_data"
+private const val UI_PREFERENCE_PREFIX = "plan_my_corpus_ui_"
 
 @JsFun("(key, value) => localStorage.setItem(key, value)")
 private external fun jsSetItem(key: String, value: String)
@@ -74,6 +75,29 @@ object WebStorage {
             jsUploadJson(onFileLoaded)
         } catch (e: Exception) {
             println("Error uploading JSON: ${e.message}")
+        }
+    }
+
+    /**
+     * Save UI preference to localStorage
+     */
+    fun saveUIPreference(key: String, value: String) {
+        try {
+            jsSetItem(UI_PREFERENCE_PREFIX + key, value)
+        } catch (e: Exception) {
+            println("Error saving UI preference: ${e.message}")
+        }
+    }
+
+    /**
+     * Load UI preference from localStorage
+     */
+    fun loadUIPreference(key: String): String? {
+        return try {
+            jsGetItem(UI_PREFERENCE_PREFIX + key)
+        } catch (e: Exception) {
+            println("Error loading UI preference: ${e.message}")
+            null
         }
     }
 }

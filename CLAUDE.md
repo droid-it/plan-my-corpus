@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Kotlin Multiplatform** financial planner application using **Compose Multiplatform (CMP)** for UI. The project targets WebAssembly (Wasm) for web deployment.
+This is a **Kotlin Multiplatform** Plan My Corpus application using **Compose Multiplatform (CMP)** for UI. The project targets WebAssembly (Wasm) for web deployment.
 
 ### Application Purpose
 
@@ -123,6 +123,9 @@ A comprehensive financial planning tool that helps users:
 
 ### Adding New UI Components
 All UI components should be created in `composeApp/src/commonMain/kotlin/` to ensure they can be shared across potential future platforms (Android, iOS, Desktop).
+
+### Icons
+**IMPORTANT**: Always use Material Icons (`Icons.Default.*`) for all icons in the application. Never use ASCII/emoji icons as they may not render correctly in WebAssembly. Material Icons are part of the Compose Material3 library and are guaranteed to work across all platforms.
 
 ### Compose Dependencies
 The project uses Material3 design system. When adding new dependencies, add them to the `commonMain` source set in `composeApp/build.gradle.kts` unless they are platform-specific.

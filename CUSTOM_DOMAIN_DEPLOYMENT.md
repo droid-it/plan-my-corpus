@@ -1,6 +1,6 @@
 # Custom Domain Deployment Guide
 
-This guide covers deploying the Financial Planner with your own custom domain. All options below are **free** for the hosting platform itself - you only pay for your domain name (typically $10-15/year).
+This guide covers deploying the Plan My Corpus with your own custom domain. All options below are **free** for the hosting platform itself - you only pay for your domain name (typically $10-15/year).
 
 ## Quick Comparison
 
@@ -423,4 +423,4 @@ If you encounter issues:
 
 **You're ready to deploy with your custom domain! 🚀**
 
-Choose your platform, follow the steps, and your Financial Planner will be live at your custom domain within an hour.
+Choose your platform, follow the steps, and your Plan My Corpus will be live at your custom domain within an hour.

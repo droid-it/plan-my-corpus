@@ -49,7 +49,7 @@ fun AboutTab() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Financial Planner",
+            text = "Plan My Corpus",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
@@ -256,6 +256,12 @@ fun ContactTab() {
                             "we're here to help improve this application.",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                Text(
+                    text = "💡 Contributions are welcome! This is an open-source project.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 
@@ -263,6 +269,8 @@ fun ContactTab() {
             icon = Icons.Default.BugReport,
             title = "Report a Bug",
             content = "Found something not working as expected?\n\n" +
+                    "Please file a GitHub Issue:\n" +
+                    "https://github.com/droid-it/plan-my-corpus/issues\n\n" +
                     "When reporting bugs, please include:\n" +
                     "• Steps to reproduce the issue\n" +
                     "• What you expected to happen\n" +
@@ -275,6 +283,8 @@ fun ContactTab() {
             icon = Icons.Default.Lightbulb,
             title = "Suggest a Feature",
             content = "Have an idea to make this app better?\n\n" +
+                    "Please file a GitHub Issue:\n" +
+                    "https://github.com/droid-it/plan-my-corpus/issues\n\n" +
                     "We're always looking for ways to improve! Tell us:\n" +
                     "• What feature you'd like to see\n" +
                     "• Why it would be useful\n" +
@@ -285,6 +295,10 @@ fun ContactTab() {
             icon = Icons.Default.Chat,
             title = "General Feedback",
             content = "Share your thoughts about the app:\n\n" +
+                    "You can reach out via:\n" +
+                    "• GitHub Issues (preferred): https://github.com/droid-it/plan-my-corpus/issues\n" +
+                    "• Email: uditverma5602@gmail.com\n\n" +
+                    "We'd love to hear:\n" +
                     "• What do you like about it?\n" +
                     "• What could be improved?\n" +
                     "• How has it helped your financial planning?"
@@ -298,18 +312,42 @@ fun ContactTab() {
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Contact Information",
+                    text = "GitHub Repository",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "GitHub: [Repository Link]\nEmail: [Your Email]",
+                    text = "https://github.com/droid-it/plan-my-corpus",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text = "Note: Replace with actual contact information before deployment",
+                    text = "⭐ Star the repo • 🐛 File issues • 🤝 Contribute code",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            )
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Developer Contact",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Email: uditverma5602@gmail.com",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "For general inquiries or direct feedback",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                 )
             }
         }
@@ -323,6 +361,7 @@ fun ContactTab() {
         Text(
             text = "This is an open-source project maintained by volunteers. " +
                     "While we strive to respond promptly, please allow reasonable time for replies. " +
+                    "GitHub Issues are monitored regularly and are the preferred way to track bugs and feature requests. " +
                     "Thank you for your patience!",
             style = MaterialTheme.typography.bodyMedium
         )

@@ -17,6 +17,18 @@ import ui.screens.*
 @Composable
 fun App() {
     val appState = remember { AppState() }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Show snackbar when message is available
+    LaunchedEffect(appState.snackbarMessage) {
+        appState.snackbarMessage?.let { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short
+            )
+            appState.clearSnackbar()
+        }
+    }
 
     MaterialTheme {
         Scaffold(
@@ -38,6 +50,9 @@ fun App() {
             },
             bottomBar = {
                 NavigationBar(appState)
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
             }
         ) { paddingValues ->
             Surface(
@@ -142,7 +157,7 @@ fun RowScope.NavigationItem(
 
 fun getScreenTitle(screen: Screen): String {
     return when (screen) {
-        Screen.Dashboard -> "Financial Planner"
+        Screen.Dashboard -> "Plan My Corpus"
         Screen.UserProfile -> "User Profile"
         Screen.InflationRates -> "Inflation Rates"
         Screen.InvestmentCategories -> "Investment Categories"

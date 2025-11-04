@@ -26,9 +26,18 @@ class AppState {
 
     internal var navigationStack = mutableListOf<Screen>()
 
+    // UI preferences (stored separately from financial data)
+    var dataStorageBannerDismissed by mutableStateOf(false)
+        private set
+
+    // Snackbar/Toast message state
+    var snackbarMessage by mutableStateOf<String?>(null)
+        private set
+
     init {
         // Load data from localStorage on init
         loadFromStorage()
+        loadUIPreferences()
     }
 
     private fun getInitialScreen(): Screen {
@@ -186,11 +195,13 @@ class AppState {
         return Json.encodeToString(snapshot)
     }
 
-    fun importFromJson(json: String) {
-        try {
-            data = Json.decodeFromString<FinancialPlanData>(json)
+    fun importFromJson(json: String): Boolean {
+        return try {
+            data = Json { ignoreUnknownKeys = true }.decodeFromString<FinancialPlanData>(json)
+            true
         } catch (e: Exception) {
             println("Error importing JSON: ${e.message}")
+            false
         }
     }
 
@@ -225,17 +236,71 @@ class AppState {
     fun downloadSnapshot() {
         try {
             val json = exportToJson()
-            val filename = "financial_plan_${formatDateForFilename()}.json"
+            val filename = "plan_my_corpus_${formatDateForFilename()}.json"
             PlatformStorage.downloadJson(json, filename)
+            showSnackbar("Data exported successfully!")
         } catch (e: Exception) {
             println("Error downloading snapshot: ${e.message}")
+            showSnackbar("Error: Failed to export data.")
         }
     }
 
     fun uploadSnapshot(onComplete: () -> Unit = {}) {
         PlatformStorage.uploadJson { json ->
-            importFromJson(json)
+            val success = importFromJson(json)
+            if (success) {
+                showSnackbar("Data imported successfully!")
+            } else {
+                showSnackbar("Error: Failed to import data. Please check the file format.")
+            }
             onComplete()
+        }
+    }
+
+    // Snackbar management
+    fun showSnackbar(message: String) {
+        snackbarMessage = message
+    }
+
+    fun clearSnackbar() {
+        snackbarMessage = null
+    }
+
+    // Clear all data and reset to defaults
+    fun clearAllData() {
+        try {
+            // Clear financial data from localStorage
+            PlatformStorage.clearLocalStorage()
+            // Reset to default empty data
+            _data = FinancialPlanData()
+            // Keep UI preferences (like banner dismissal) but could clear if needed
+            showSnackbar("All data cleared successfully")
+        } catch (e: Exception) {
+            println("Error clearing data: ${e.message}")
+            showSnackbar("Error: Failed to clear data")
+        }
+    }
+
+    // UI Preferences management
+    fun dismissDataStorageBanner() {
+        dataStorageBannerDismissed = true
+        saveUIPreferences()
+    }
+
+    private fun saveUIPreferences() {
+        try {
+            PlatformStorage.saveUIPreference("dataStorageBannerDismissed", dataStorageBannerDismissed.toString())
+        } catch (e: Exception) {
+            println("Error saving UI preferences: ${e.message}")
+        }
+    }
+
+    private fun loadUIPreferences() {
+        try {
+            val dismissed = PlatformStorage.loadUIPreference("dataStorageBannerDismissed")
+            dataStorageBannerDismissed = dismissed == "true"
+        } catch (e: Exception) {
+            println("Error loading UI preferences: ${e.message}")
         }
     }
 }

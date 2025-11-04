@@ -1,6 +1,6 @@
-# Deployment Guide - Financial Planner
+# Deployment Guide - Plan My Corpus
 
-This guide provides step-by-step instructions for deploying the Financial Planner application to production.
+This guide provides step-by-step instructions for deploying the Plan My Corpus application to production.
 
 ## Prerequisites
 

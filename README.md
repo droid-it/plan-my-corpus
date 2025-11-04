@@ -1,4 +1,4 @@
-# Financial Planner
+# Plan My Corpus
 
 A comprehensive Kotlin Multiplatform financial planning application built with Compose Multiplatform for the web. Plan your retirement, track goals, and visualize your financial future with precision.
 
@@ -117,7 +117,7 @@ The project includes pre-configured run configurations:
 ## Project Structure
 
 ```
-financial-planner/
+plan-my-corpus/
 ├── composeApp/              # Main application module
 │   └── src/
 │       ├── commonMain/      # Shared Kotlin code
@@ -222,21 +222,6 @@ Year-by-year simulation:
   - Goal markers with tooltips
   - Retirement milestone indicator
   - Realistic post-retirement drawdown visualization
-
-#### Calculation Improvements
-- Fixed post-retirement corpus to show realistic drawdown (expenses + goals)
-- Pre-retirement goals account for lost growth opportunity
-- Post-retirement goals use Present Value discounting
-- Separate handling of pre-retirement and post-retirement goal impact
-- Single post-retirement growth rate for simplified planning
-
-#### UI/UX Improvements
-- Indian currency formatting (lakhs/crores) for all money inputs
-- Full CRUD operations for investment and inflation categories
-- Settings hub with navigation to all configuration screens
-- Back navigation and URL routing for better user experience
-- Real-time calculation updates with transparent formulas
-- Step-up percentage display on contribution cards
 
 ## Data Model
 
@@ -466,36 +451,38 @@ Year-by-year simulation:
     - Privacy policy (data stored locally)
     - Terms of use
 
-## Deployment
+## Contributing
 
-Ready to deploy your Financial Planner to production?
+Contributions are welcome! If you'd like to contribute:
 
-### Quick Start (Free Hosting)
-See [DEPLOYMENT.md](DEPLOYMENT.md) for basic deployment to free hosting platforms.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Custom Domain Setup
-Want to use your own domain (e.g., `financialplanner.com`)? See [CUSTOM_DOMAIN_DEPLOYMENT.md](CUSTOM_DOMAIN_DEPLOYMENT.md) for detailed guides:
-
-- **Platform comparisons** with custom domain support
-- **Step-by-step DNS configuration** for each platform
-- **Domain registrar recommendations** (from $10/year)
-- **Subdomain vs apex domain** setup
-- **SSL/HTTPS** certificate configuration (free & automatic)
-- **Complete cost breakdown** ($10-15/year total)
-
-**Recommended:** Cloudflare Pages + Cloudflare Registrar for easiest setup and best performance.
-
-All hosting platforms are **100% FREE** - you only pay for the domain name (~$10-15/year).
-
-## Documentation
-
-See [CLAUDE.md](CLAUDE.md) for detailed technical documentation, including:
-- Complete feature list
-- Acceptance criteria
-- Implementation progress
-- Architecture details
-- Development guidelines
+Please report bugs and suggest features via [GitHub Issues](https://github.com/droid-it/plan-my-corpus/issues).
 
 ## License
 
-This project is private and not licensed for public use.
+MIT License
+
+Copyright (c) 2025 Plan My Corpus
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
