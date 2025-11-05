@@ -67,7 +67,6 @@ fun App() {
                     Screen.InflationRates -> InflationRatesScreen(appState)
                     Screen.InvestmentCategories -> InvestmentCategoriesScreen(appState)
                     Screen.Portfolio -> PortfolioScreen(appState)
-                    Screen.Contributions -> ContributionsScreen(appState)
                     Screen.Goals -> GoalsScreen(appState)
                     Screen.Analysis -> AnalysisScreen(appState)
                     Screen.Settings -> SettingsScreen(appState)
@@ -162,7 +161,6 @@ fun getScreenTitle(screen: Screen): String {
         Screen.InflationRates -> "Inflation Rates"
         Screen.InvestmentCategories -> "Investment Categories"
         Screen.Portfolio -> "Portfolio"
-        Screen.Contributions -> "Contributions"
         Screen.Goals -> "Goals"
         Screen.Analysis -> "Analysis"
         Screen.Settings -> "Settings"

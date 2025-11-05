@@ -41,7 +41,6 @@ actual fun updateBrowserUrl(screen: Screen) {
         Screen.InflationRates -> "/inflation-rates"
         Screen.InvestmentCategories -> "/investment-categories"
         Screen.Portfolio -> "/portfolio"
-        Screen.Contributions -> "/contributions"
         Screen.Goals -> "/goals"
         Screen.Analysis -> "/analysis"
         Screen.Settings -> "/settings"
