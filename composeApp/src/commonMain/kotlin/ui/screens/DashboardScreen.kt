@@ -33,14 +33,8 @@ fun DashboardScreen(appState: AppState) {
     // Calculate current corpus (total of all current investments)
     val currentCorpus = appState.data.investments.filter { it.isEnabled }.sumOf { it.currentValue }
 
-    // Check if user needs onboarding
-    val hasNoProfile = appState.data.userProfile.currentAge == 30 &&
-                       appState.data.userProfile.retirementAge == 60 // Default values
-    val hasNoInvestments = appState.data.investments.isEmpty()
-    val hasNoGoals = appState.data.goals.isEmpty()
-    val hasNoContributions = appState.data.ongoingContributions.isEmpty()
-
-    val needsOnboarding = hasNoProfile || hasNoInvestments || hasNoGoals
+    // Check if using sample data
+    val isSampleData = appState.data.isSampleData
 
     Column(
         modifier = Modifier
@@ -49,8 +43,8 @@ fun DashboardScreen(appState: AppState) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Onboarding Nudge - Show only when user hasn't set up basics
-        if (needsOnboarding) {
+        // Sample Data Welcome Card
+        if (isSampleData) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -72,49 +66,71 @@ fun DashboardScreen(appState: AppState) {
                             modifier = Modifier.size(28.dp)
                         )
                         Text(
-                            text = "Welcome! Let's get started",
+                            text = "Sample Data Loaded",
                             style = MaterialTheme.typography.titleLarge
                         )
                     }
                     Text(
-                        text = "Set up these basics to see your financial health:",
+                        text = "We've pre-filled realistic financial data to help you explore features:",
                         style = MaterialTheme.typography.bodyMedium
                     )
 
-                    if (hasNoProfile || appState.data.userProfile.currentMonthlyExpenses == 50000.0) {
-                        OnboardingItem(
-                            icon = Icons.Default.Person,
-                            title = "Set up your profile",
-                            description = "Add your age, retirement plans, and monthly expenses",
-                            onClick = { appState.navigateTo(Screen.UserProfile) }
+                    Column(
+                        modifier = Modifier.padding(start = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("• 3 Current Investments (₹${formatAmount(currentCorpus)})", style = MaterialTheme.typography.bodyMedium)
+                        Text("• 1 Future Lumpsum Investment", style = MaterialTheme.typography.bodyMedium)
+                        Text("• 3 Ongoing Contributions (SIPs)", style = MaterialTheme.typography.bodyMedium)
+                        Text("• 4 Financial Goals", style = MaterialTheme.typography.bodyMedium)
+                        Text("• Complete user profile", style = MaterialTheme.typography.bodyMedium)
+                    }
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                    Text(
+                        text = "Edit any item to make it yours - the sample data flag will be automatically removed. Or clear all data from Settings to start fresh.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                    )
+                }
+            }
+
+            // Quick Start Guide Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = "Quick Start Guide",
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
 
-                    if (hasNoInvestments) {
-                        OnboardingItem(
-                            icon = Icons.Default.AccountBalance,
-                            title = "Add your current investments",
-                            description = "Track your existing portfolio value",
-                            onClick = { appState.currentScreen = Screen.Portfolio; updateBrowserUrl(Screen.Portfolio) }
-                        )
-                    }
-
-                    if (hasNoGoals) {
-                        OnboardingItem(
-                            icon = Icons.Default.Flag,
-                            title = "Define your financial goals",
-                            description = "What are you planning for? Retirement, education, house?",
-                            onClick = { appState.currentScreen = Screen.Goals; updateBrowserUrl(Screen.Goals) }
-                        )
-                    }
-
-                    if (hasNoContributions) {
-                        OnboardingItem(
-                            icon = Icons.Default.Add,
-                            title = "Add future investments",
-                            description = "Add your SIPs, PPF, or other planned investments",
-                            onClick = { appState.currentScreen = Screen.Portfolio; updateBrowserUrl(Screen.Portfolio) }
-                        )
+                    Column(
+                        modifier = Modifier.padding(start = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("1. Review your corpus health below", style = MaterialTheme.typography.bodyMedium)
+                        Text("2. Check the Analysis tab for detailed projections", style = MaterialTheme.typography.bodyMedium)
+                        Text("3. Modify sample data to match your finances", style = MaterialTheme.typography.bodyMedium)
+                        Text("4. Export your snapshot from Settings", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
