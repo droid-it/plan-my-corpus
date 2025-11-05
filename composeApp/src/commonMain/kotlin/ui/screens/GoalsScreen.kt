@@ -248,6 +248,7 @@ fun GoalDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Goal Name") },
+                    supportingText = { Text("E.g., House Down Payment, Child's Education, Vacation") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -297,6 +298,7 @@ fun GoalDialog(
                         value = recurringStartAge,
                         onValueChange = { recurringStartAge = it },
                         label = { Text("Start Age") },
+                        supportingText = { Text("Your age when this recurring goal begins") },
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -304,6 +306,7 @@ fun GoalDialog(
                         value = recurringEndAge,
                         onValueChange = { recurringEndAge = it },
                         label = { Text("End Age") },
+                        supportingText = { Text("Your age when this recurring goal ends") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 } else {
@@ -312,6 +315,7 @@ fun GoalDialog(
                         value = targetYear,
                         onValueChange = { targetYear = it },
                         label = { Text("Target Year") },
+                        supportingText = { Text("Year when you need this amount (e.g., 2030)") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -329,6 +333,7 @@ fun GoalDialog(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Priority") },
+                        supportingText = { Text("Must-have goals are calculated separately in analysis") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedPriority) },
                         modifier = Modifier.fillMaxWidth().menuAnchor()
                     )
@@ -359,6 +364,7 @@ fun GoalDialog(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Timeline") },
+                        supportingText = { Text("Helps categorize your goals by timeframe") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTimeline) },
                         modifier = Modifier.fillMaxWidth().menuAnchor()
                     )

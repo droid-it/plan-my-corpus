@@ -216,13 +216,15 @@ fun ContributionDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Contribution Name") },
+                    supportingText = { Text("E.g., Monthly SIP, Quarterly PPF, Yearly NPS") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 CurrencyTextField(
                     value = amount,
                     onValueChange = { amount = it },
-                    label = "Amount",
+                    label = "Amount per Period",
+                    supportingText = { Text("Amount you contribute per payment period") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -253,6 +255,7 @@ fun ContributionDialog(
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Frequency") },
+                        supportingText = { Text("How often you make this contribution") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedFrequency) },
                         modifier = Modifier.fillMaxWidth().menuAnchor()
                     )
