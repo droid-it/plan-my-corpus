@@ -82,7 +82,7 @@ fun DashboardScreen(appState: AppState) {
                         Text("• 3 Current Investments (₹${formatAmount(currentCorpus)})", style = MaterialTheme.typography.bodyMedium)
                         Text("• 1 Future Lumpsum Investment", style = MaterialTheme.typography.bodyMedium)
                         Text("• 3 Ongoing Contributions (SIPs)", style = MaterialTheme.typography.bodyMedium)
-                        Text("• 8 Financial Goals (including repeating vacations)", style = MaterialTheme.typography.bodyMedium)
+                        Text("• 4 Financial Goals (1 recurring vacation)", style = MaterialTheme.typography.bodyMedium)
                         Text("• Complete user profile", style = MaterialTheme.typography.bodyMedium)
                     }
 
