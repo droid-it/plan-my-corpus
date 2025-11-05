@@ -1,0 +1,59 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build production bundle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :composeApp:wasmJsBrowserProductionWebpack --no-daemon --stacktrace
+
+      - name: Prepare deployment files
+        run: |
+          mkdir -p deploy
+          cp composeApp/build/kotlin-webpack/wasmJs/productionExecutable/* deploy/ || true
+          cp composeApp/build/processedResources/wasmJs/main/index.html deploy/ || true
+          # Also check alternative build output locations
+          if [ ! -f deploy/index.html ]; then
+            cp composeApp/build/dist/wasmJs/productionExecutable/* deploy/ 2>/dev/null || true
+          fi
+          # Create .nojekyll to ensure proper serving of files
+          touch deploy/.nojekyll
+          ls -la deploy/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "Deploy from ${{ github.sha }}"
