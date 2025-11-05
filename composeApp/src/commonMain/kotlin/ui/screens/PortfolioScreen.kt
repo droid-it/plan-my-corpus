@@ -41,12 +41,12 @@ fun PortfolioScreen(appState: AppState) {
             Tab(
                 selected = selectedTab == 0,
                 onClick = { selectedTab = 0 },
-                text = { Text("Current Portfolio") }
+                text = { Text("What I Have") }
             )
             Tab(
                 selected = selectedTab == 1,
                 onClick = { selectedTab = 1 },
-                text = { Text("Future Investments") }
+                text = { Text("What I'm Planning") }
             )
         }
 
