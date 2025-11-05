@@ -54,6 +54,7 @@ fun PortfolioScreen(appState: AppState) {
         InvestmentDialog(
             investment = null,
             categories = appState.data.investmentCategories,
+            isFirstInvestment = appState.data.investments.isEmpty(),
             onDismiss = { showAddDialog = false },
             onSave = { investment ->
                 appState.addInvestment(investment)
@@ -66,6 +67,7 @@ fun PortfolioScreen(appState: AppState) {
         InvestmentDialog(
             investment = investment,
             categories = appState.data.investmentCategories,
+            isFirstInvestment = false,
             onDismiss = { editingInvestment = null },
             onSave = { updated ->
                 appState.updateInvestment(investment.id, updated)
@@ -190,6 +192,7 @@ fun InvestmentCard(
 fun InvestmentDialog(
     investment: Investment?,
     categories: List<model.InvestmentCategory>,
+    isFirstInvestment: Boolean = false,
     onDismiss: () -> Unit,
     onSave: (Investment) -> Unit
 ) {
@@ -204,6 +207,32 @@ fun InvestmentDialog(
         title = { Text(if (investment == null) "Add Investment" else "Edit Investment") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Show info card for first investment
+                if (isFirstInvestment && investment == null) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                "Tip: Manage Investment Categories",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                "You can add more investment categories or edit expected XIRR rates from the Settings page.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                }
+
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
