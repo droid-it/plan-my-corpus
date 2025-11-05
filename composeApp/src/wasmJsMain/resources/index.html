@@ -14,10 +14,53 @@
             width: 100vw;
             height: 100vh;
         }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: Arial, sans-serif;
+            color: red;
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <div id="loading">Loading Plan My Corpus...</div>
+    <div id="error"></div>
     <canvas id="ComposeTarget"></canvas>
-    <script src="composeApp.js"></script>
+    <script>
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = 'Error loading application: ' + e.message;
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = 'Error loading application: ' + e.reason;
+        });
+    </script>
+    <script src="composeApp.js" onerror="document.getElementById('error').innerHTML='Failed to load composeApp.js'; document.getElementById('error').style.display='block';"></script>
+    <script>
+        // Hide loading message after a delay if app loaded successfully
+        setTimeout(function() {
+            if (document.getElementById('ComposeTarget').getContext) {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }, 3000);
+    </script>
 </body>
 </html>
