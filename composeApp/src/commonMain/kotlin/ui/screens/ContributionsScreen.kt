@@ -249,8 +249,9 @@ fun ContributionDialog(
                     expanded = expandedCategory,
                     onExpandedChange = { expandedCategory = it }
                 ) {
+                    val selectedCategory = categories.find { it.id == selectedCategoryId }
                     OutlinedTextField(
-                        value = categories.find { it.id == selectedCategoryId }?.name ?: "",
+                        value = selectedCategory?.let { "${it.name} (${it.preRetirementXIRR}%)" } ?: "",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Investment Category") },
@@ -263,7 +264,7 @@ fun ContributionDialog(
                     ) {
                         categories.forEach { category ->
                             DropdownMenuItem(
-                                text = { Text(category.name) },
+                                text = { Text("${category.name} (${category.preRetirementXIRR}%)") },
                                 onClick = {
                                     selectedCategoryId = category.id
                                     expandedCategory = false

@@ -384,8 +384,9 @@ fun GoalDialog(
                     expanded = expandedInflation,
                     onExpandedChange = { expandedInflation = it }
                 ) {
+                    val selectedCategory = inflationCategories.find { it.id == selectedInflationCategoryId }
                     OutlinedTextField(
-                        value = inflationCategories.find { it.id == selectedInflationCategoryId }?.name ?: "",
+                        value = selectedCategory?.let { "${it.name} (${it.rate}%)" } ?: "",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Inflation Category") },
