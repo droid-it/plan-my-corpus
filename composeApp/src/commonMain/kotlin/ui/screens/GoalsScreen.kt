@@ -59,6 +59,7 @@ fun GoalsScreen(appState: AppState) {
         GoalDialog(
             goal = null,
             inflationCategories = appState.data.inflationCategories,
+            isFirstGoal = appState.data.goals.isEmpty(),
             onDismiss = { showAddDialog = false },
             onSave = { goal ->
                 appState.addGoal(goal)
@@ -72,6 +73,7 @@ fun GoalsScreen(appState: AppState) {
         GoalDialog(
             goal = goal,
             inflationCategories = appState.data.inflationCategories,
+            isFirstGoal = false,
             onDismiss = { editingGoal = null },
             onSave = { updated ->
                 appState.updateGoal(goal.id, updated)
@@ -190,6 +192,7 @@ fun GoalCard(
 fun GoalDialog(
     goal: FinancialGoal?,
     inflationCategories: List<InflationCategory>,
+    isFirstGoal: Boolean = false,
     onDismiss: () -> Unit,
     onSave: (FinancialGoal) -> Unit,
     appState: AppState
@@ -215,6 +218,32 @@ fun GoalDialog(
                     .padding(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Show info card for first goal
+                if (isFirstGoal && goal == null) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                "Tip: Manage Inflation Categories",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                "You can add more inflation categories or edit rates from the Settings page to better match your goals.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                }
+
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
