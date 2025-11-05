@@ -53,8 +53,6 @@ fun PortfolioScreen(appState: AppState) {
     if (showAddDialog) {
         InvestmentDialog(
             investment = null,
-            categories = appState.data.investmentCategories,
-            isFirstInvestment = appState.data.investments.isEmpty(),
             onDismiss = { showAddDialog = false },
             onSave = { investment ->
                 appState.addInvestment(investment)
@@ -66,8 +64,6 @@ fun PortfolioScreen(appState: AppState) {
     editingInvestment?.let { investment ->
         InvestmentDialog(
             investment = investment,
-            categories = appState.data.investmentCategories,
-            isFirstInvestment = false,
             onDismiss = { editingInvestment = null },
             onSave = { updated ->
                 appState.updateInvestment(investment.id, updated)
@@ -111,7 +107,6 @@ fun CurrentInvestmentsTab(
             appState.data.investments.forEach { investment ->
                 InvestmentCard(
                     investment = investment,
-                    categories = appState.data.investmentCategories,
                     onEdit = { onEditingInvestment(it) },
                     onDelete = { appState.removeInvestment(it.id) },
                     onToggle = { appState.toggleInvestment(it.id) }
@@ -124,13 +119,10 @@ fun CurrentInvestmentsTab(
 @Composable
 fun InvestmentCard(
     investment: Investment,
-    categories: List<model.InvestmentCategory>,
     onEdit: (Investment) -> Unit,
     onDelete: (Investment) -> Unit,
     onToggle: (Investment) -> Unit
 ) {
-    val category = categories.find { it.id == investment.categoryId }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -151,10 +143,7 @@ fun InvestmentCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(investment.name, style = MaterialTheme.typography.titleMedium)
                     Text("Value: ₹${formatAmount(investment.currentValue)}")
-                    Text("Actual XIRR: ${investment.actualXIRR}%")
-                    category?.let {
-                        Text("Category: ${it.name}", style = MaterialTheme.typography.bodySmall)
-                    }
+                    Text("Current XIRR: ${investment.currentXIRR}%")
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     IconButton(onClick = { onEdit(investment) }) {
@@ -187,52 +176,21 @@ fun InvestmentCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvestmentDialog(
     investment: Investment?,
-    categories: List<model.InvestmentCategory>,
-    isFirstInvestment: Boolean = false,
     onDismiss: () -> Unit,
     onSave: (Investment) -> Unit
 ) {
     var name by remember { mutableStateOf(investment?.name ?: "") }
     var value by remember { mutableStateOf(investment?.currentValue?.toString() ?: "") }
-    var xirr by remember { mutableStateOf(investment?.actualXIRR?.toString() ?: "") }
-    var selectedCategoryId by remember { mutableStateOf(investment?.categoryId ?: categories.firstOrNull()?.id ?: "") }
-    var expandedDropdown by remember { mutableStateOf(false) }
+    var xirr by remember { mutableStateOf(investment?.currentXIRR?.toString() ?: "") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (investment == null) "Add Investment" else "Edit Investment") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                // Show info card for first investment
-                if (isFirstInvestment && investment == null) {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                "Tip: Manage Investment Categories",
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                            Text(
-                                "You can add more investment categories or edit expected XIRR rates from the Settings page.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                    }
-                }
-
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -250,40 +208,9 @@ fun InvestmentDialog(
                 OutlinedTextField(
                     value = xirr,
                     onValueChange = { xirr = it },
-                    label = { Text("Actual XIRR (%)") },
+                    label = { Text("Current XIRR (%)") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                ExposedDropdownMenuBox(
-                    expanded = expandedDropdown,
-                    onExpandedChange = { expandedDropdown = it }
-                ) {
-                    val selectedCategory = categories.find { it.id == selectedCategoryId }
-                    OutlinedTextField(
-                        value = selectedCategory?.let { "${it.name} (${it.preRetirementXIRR}%)" } ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Investment Category") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDropdown) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expandedDropdown,
-                        onDismissRequest = { expandedDropdown = false }
-                    ) {
-                        categories.forEach { category ->
-                            DropdownMenuItem(
-                                text = { Text("${category.name} (${category.preRetirementXIRR}%)") },
-                                onClick = {
-                                    selectedCategoryId = category.id
-                                    expandedDropdown = false
-                                }
-                            )
-                        }
-                    }
-                }
             }
         },
         confirmButton = {
@@ -295,8 +222,7 @@ fun InvestmentDialog(
                         id = investment?.id ?: randomUUID(),
                         name = name,
                         currentValue = valueDouble,
-                        categoryId = selectedCategoryId,
-                        actualXIRR = xirrDouble
+                        currentXIRR = xirrDouble
                     )
                     onSave(newInvestment)
                 }

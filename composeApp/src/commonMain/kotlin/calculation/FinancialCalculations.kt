@@ -193,19 +193,14 @@ object FinancialCalculations {
 
         // Sum all current investments' future values (only enabled ones)
         val investmentsFV = data.investments.filter { it.isEnabled }.sumOf { investment ->
-            val category = data.investmentCategories.find { it.id == investment.categoryId }
-            if (category != null) {
-                calculateInvestmentFutureValue(
-                    investment.currentValue,
-                    currentYear,
-                    targetYear,
-                    retirementYear,
-                    category.preRetirementXIRR,
-                    postRetirementRate
-                )
-            } else {
-                investment.currentValue
-            }
+            calculateInvestmentFutureValue(
+                investment.currentValue,
+                currentYear,
+                targetYear,
+                retirementYear,
+                investment.currentXIRR,
+                postRetirementRate
+            )
         }
 
         // Sum all ongoing contributions' future values (only enabled ones)

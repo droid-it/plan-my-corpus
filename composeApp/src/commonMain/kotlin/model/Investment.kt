@@ -7,7 +7,6 @@ data class Investment(
     val id: String,
     val name: String,
     val currentValue: Double,
-    val categoryId: String,
-    val actualXIRR: Double, // actual historical return percentage
+    val currentXIRR: Double, // current XIRR percentage
     val isEnabled: Boolean = true // Allow temporarily disabling without deleting
 )
