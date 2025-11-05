@@ -39,14 +39,18 @@ jobs:
       - name: Prepare deployment files
         run: |
           mkdir -p deploy
-          cp composeApp/build/kotlin-webpack/wasmJs/productionExecutable/* deploy/ || true
+          # Copy webpack bundle output
+          cp -r composeApp/build/kotlin-webpack/wasmJs/productionExecutable/* deploy/ || true
+          # Copy index.html
           cp composeApp/build/processedResources/wasmJs/main/index.html deploy/ || true
-          # Also check alternative build output locations
-          if [ ! -f deploy/index.html ]; then
-            cp composeApp/build/dist/wasmJs/productionExecutable/* deploy/ 2>/dev/null || true
-          fi
+          # Copy skiko runtime files (required for Compose Multiplatform)
+          cp composeApp/build/compose/skiko-for-web-runtime/skiko.wasm deploy/ || true
+          cp composeApp/build/compose/skiko-for-web-runtime/skiko.mjs deploy/ || true
+          # Copy composeApp.wasm (main application WASM)
+          cp composeApp/build/compileSync/wasmJs/main/productionExecutable/optimized/composeApp.wasm deploy/ || true
           # Create .nojekyll to ensure proper serving of files
           touch deploy/.nojekyll
+          echo "Deployment files:"
           ls -la deploy/
 
       - name: Deploy to GitHub Pages
