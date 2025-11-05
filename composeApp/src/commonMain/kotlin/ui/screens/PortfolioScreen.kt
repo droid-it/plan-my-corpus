@@ -237,6 +237,7 @@ fun InvestmentDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text("Investment Name") },
+                    supportingText = { Text("E.g., PPF Account, ELSS Fund, Real Estate") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -244,6 +245,7 @@ fun InvestmentDialog(
                     value = value,
                     onValueChange = { value = it },
                     label = "Current Value",
+                    supportingText = { Text("Today's market value of your investment") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -251,6 +253,7 @@ fun InvestmentDialog(
                     value = xirr,
                     onValueChange = { xirr = it },
                     label = { Text("Actual XIRR (%)") },
+                    supportingText = { Text("Historical return rate of this specific investment") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
