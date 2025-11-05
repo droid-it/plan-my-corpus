@@ -29,6 +29,14 @@ class AppState {
     // UI preferences (stored separately from financial data)
     var dataStorageBannerDismissed by mutableStateOf(false)
         private set
+    var welcomeCardDismissed by mutableStateOf(false)
+        private set
+    var quickStartCardDismissed by mutableStateOf(false)
+        private set
+    var sampleDataGoalsCardDismissed by mutableStateOf(false)
+        private set
+    var sampleDataPortfolioCardDismissed by mutableStateOf(false)
+        private set
 
     // Snackbar/Toast message state
     var snackbarMessage by mutableStateOf<String?>(null)
@@ -320,9 +328,33 @@ class AppState {
         saveUIPreferences()
     }
 
+    fun dismissWelcomeCard() {
+        welcomeCardDismissed = true
+        saveUIPreferences()
+    }
+
+    fun dismissQuickStartCard() {
+        quickStartCardDismissed = true
+        saveUIPreferences()
+    }
+
+    fun dismissSampleDataGoalsCard() {
+        sampleDataGoalsCardDismissed = true
+        saveUIPreferences()
+    }
+
+    fun dismissSampleDataPortfolioCard() {
+        sampleDataPortfolioCardDismissed = true
+        saveUIPreferences()
+    }
+
     private fun saveUIPreferences() {
         try {
             PlatformStorage.saveUIPreference("dataStorageBannerDismissed", dataStorageBannerDismissed.toString())
+            PlatformStorage.saveUIPreference("welcomeCardDismissed", welcomeCardDismissed.toString())
+            PlatformStorage.saveUIPreference("quickStartCardDismissed", quickStartCardDismissed.toString())
+            PlatformStorage.saveUIPreference("sampleDataGoalsCardDismissed", sampleDataGoalsCardDismissed.toString())
+            PlatformStorage.saveUIPreference("sampleDataPortfolioCardDismissed", sampleDataPortfolioCardDismissed.toString())
         } catch (e: Exception) {
             println("Error saving UI preferences: ${e.message}")
         }
@@ -330,8 +362,11 @@ class AppState {
 
     private fun loadUIPreferences() {
         try {
-            val dismissed = PlatformStorage.loadUIPreference("dataStorageBannerDismissed")
-            dataStorageBannerDismissed = dismissed == "true"
+            dataStorageBannerDismissed = PlatformStorage.loadUIPreference("dataStorageBannerDismissed") == "true"
+            welcomeCardDismissed = PlatformStorage.loadUIPreference("welcomeCardDismissed") == "true"
+            quickStartCardDismissed = PlatformStorage.loadUIPreference("quickStartCardDismissed") == "true"
+            sampleDataGoalsCardDismissed = PlatformStorage.loadUIPreference("sampleDataGoalsCardDismissed") == "true"
+            sampleDataPortfolioCardDismissed = PlatformStorage.loadUIPreference("sampleDataPortfolioCardDismissed") == "true"
         } catch (e: Exception) {
             println("Error loading UI preferences: ${e.message}")
         }
