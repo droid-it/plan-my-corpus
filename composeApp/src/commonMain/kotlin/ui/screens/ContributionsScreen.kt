@@ -68,6 +68,7 @@ fun ContributionsScreen(appState: AppState, showHeader: Boolean = true) {
         ContributionDialog(
             contribution = null,
             categories = appState.data.investmentCategories,
+            isFirstContribution = appState.data.ongoingContributions.isEmpty(),
             onDismiss = { showAddDialog = false },
             onSave = { contribution ->
                 appState.addContribution(contribution)
@@ -80,6 +81,7 @@ fun ContributionsScreen(appState: AppState, showHeader: Boolean = true) {
         ContributionDialog(
             contribution = contribution,
             categories = appState.data.investmentCategories,
+            isFirstContribution = false,
             onDismiss = { editingContribution = null },
             onSave = { updated ->
                 appState.updateContribution(contribution.id, updated)
@@ -168,6 +170,7 @@ fun ContributionCard(
 fun ContributionDialog(
     contribution: OngoingContribution?,
     categories: List<InvestmentCategory>,
+    isFirstContribution: Boolean = false,
     onDismiss: () -> Unit,
     onSave: (OngoingContribution) -> Unit
 ) {
@@ -183,6 +186,32 @@ fun ContributionDialog(
         title = { Text(if (contribution == null) "Add Contribution" else "Edit Contribution") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Show info card for first contribution
+                if (isFirstContribution && contribution == null) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                "Tip: Manage Investment Categories",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                "You can add more investment categories or edit expected XIRR rates from the Settings page.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                }
+
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
