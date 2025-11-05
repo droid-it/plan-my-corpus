@@ -86,154 +86,122 @@ class AppState {
             }
         }
 
-    // Helper function to clear sample data flag
-    private fun clearSampleDataFlag() {
-        if (data.isSampleData) {
-            data = data.copy(isSampleData = false)
-        }
-    }
-
     // Update functions
     fun updateUserProfile(profile: UserProfile) {
-        clearSampleDataFlag()
         data = data.copy(userProfile = profile)
     }
 
     fun updateInflationCategories(categories: List<InflationCategory>) {
-        clearSampleDataFlag()
         data = data.copy(inflationCategories = categories)
     }
 
     fun addInflationCategory(category: InflationCategory) {
-        clearSampleDataFlag()
         data = data.copy(inflationCategories = data.inflationCategories + category)
     }
 
     fun updateInflationCategory(id: String, updated: InflationCategory) {
-        clearSampleDataFlag()
         data = data.copy(
             inflationCategories = data.inflationCategories.map { if (it.id == id) updated else it }
         )
     }
 
     fun removeInflationCategory(id: String) {
-        clearSampleDataFlag()
         data = data.copy(inflationCategories = data.inflationCategories.filter { it.id != id })
     }
 
     fun updateInvestmentCategories(categories: List<InvestmentCategory>) {
-        clearSampleDataFlag()
         data = data.copy(investmentCategories = categories)
     }
 
     fun addInvestmentCategory(category: InvestmentCategory) {
-        clearSampleDataFlag()
         data = data.copy(investmentCategories = data.investmentCategories + category)
     }
 
     fun updateInvestmentCategory(id: String, updated: InvestmentCategory) {
-        clearSampleDataFlag()
         data = data.copy(
             investmentCategories = data.investmentCategories.map { if (it.id == id) updated else it }
         )
     }
 
     fun removeInvestmentCategory(id: String) {
-        clearSampleDataFlag()
         data = data.copy(investmentCategories = data.investmentCategories.filter { it.id != id })
     }
 
     fun addInvestment(investment: Investment) {
-        clearSampleDataFlag()
         data = data.copy(investments = data.investments + investment)
     }
 
     fun updateInvestment(id: String, updated: Investment) {
-        clearSampleDataFlag()
         data = data.copy(
             investments = data.investments.map { if (it.id == id) updated else it }
         )
     }
 
     fun removeInvestment(id: String) {
-        clearSampleDataFlag()
         data = data.copy(investments = data.investments.filter { it.id != id })
     }
 
     fun addContribution(contribution: OngoingContribution) {
-        clearSampleDataFlag()
         data = data.copy(ongoingContributions = data.ongoingContributions + contribution)
     }
 
     fun updateContribution(id: String, updated: OngoingContribution) {
-        clearSampleDataFlag()
         data = data.copy(
             ongoingContributions = data.ongoingContributions.map { if (it.id == id) updated else it }
         )
     }
 
     fun removeContribution(id: String) {
-        clearSampleDataFlag()
         data = data.copy(ongoingContributions = data.ongoingContributions.filter { it.id != id })
     }
 
     fun addGoal(goal: FinancialGoal) {
-        clearSampleDataFlag()
         data = data.copy(goals = data.goals + goal)
     }
 
     fun updateGoal(id: String, updated: FinancialGoal) {
-        clearSampleDataFlag()
         data = data.copy(
             goals = data.goals.map { if (it.id == id) updated else it }
         )
     }
 
     fun removeGoal(id: String) {
-        clearSampleDataFlag()
         data = data.copy(goals = data.goals.filter { it.id != id })
     }
 
     fun toggleGoal(id: String) {
-        clearSampleDataFlag()
         data = data.copy(
             goals = data.goals.map { if (it.id == id) it.copy(isEnabled = !it.isEnabled) else it }
         )
     }
 
     fun toggleInvestment(id: String) {
-        clearSampleDataFlag()
         data = data.copy(
             investments = data.investments.map { if (it.id == id) it.copy(isEnabled = !it.isEnabled) else it }
         )
     }
 
     fun toggleContribution(id: String) {
-        clearSampleDataFlag()
         data = data.copy(
             ongoingContributions = data.ongoingContributions.map { if (it.id == id) it.copy(isEnabled = !it.isEnabled) else it }
         )
     }
 
     fun addFutureLumpsumInvestment(investment: FutureLumpsumInvestment) {
-        clearSampleDataFlag()
         data = data.copy(futureLumpsumInvestments = data.futureLumpsumInvestments + investment)
     }
 
     fun updateFutureLumpsumInvestment(id: String, updated: FutureLumpsumInvestment) {
-        clearSampleDataFlag()
         data = data.copy(
             futureLumpsumInvestments = data.futureLumpsumInvestments.map { if (it.id == id) updated else it }
         )
     }
 
     fun removeFutureLumpsumInvestment(id: String) {
-        clearSampleDataFlag()
         data = data.copy(futureLumpsumInvestments = data.futureLumpsumInvestments.filter { it.id != id })
     }
 
     fun toggleFutureLumpsumInvestment(id: String) {
-        clearSampleDataFlag()
         data = data.copy(
             futureLumpsumInvestments = data.futureLumpsumInvestments.map { if (it.id == id) it.copy(isEnabled = !it.isEnabled) else it }
         )
