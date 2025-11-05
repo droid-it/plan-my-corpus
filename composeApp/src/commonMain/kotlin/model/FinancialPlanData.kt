@@ -11,5 +11,6 @@ data class FinancialPlanData(
     val futureLumpsumInvestments: List<FutureLumpsumInvestment> = emptyList(),
     val ongoingContributions: List<OngoingContribution> = emptyList(),
     val goals: List<FinancialGoal> = emptyList(),
-    val snapshotTimestamp: Long = 0 // For year-over-year comparison
+    val snapshotTimestamp: Long = 0, // For year-over-year comparison
+    val isSampleData: Boolean = false // Flag to indicate if this is sample demo data
 )

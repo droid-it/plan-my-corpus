@@ -244,12 +244,19 @@ class AppState {
             val json = PlatformStorage.loadFromLocalStorage()
             if (json != null) {
                 _data = Json { ignoreUnknownKeys = true }.decodeFromString<FinancialPlanData>(json)
+            } else {
+                // First-time user: load sample data
+                _data = model.SampleData.createSampleFinancialData()
+                // Auto-save the sample data
+                autoSave()
             }
         } catch (e: Exception) {
             println("Error loading from storage: ${e.message}")
             println("Stack trace: ${e.stackTraceToString()}")
-            // Clear corrupted data and start fresh
+            // Clear corrupted data and load sample data
             PlatformStorage.clearLocalStorage()
+            _data = model.SampleData.createSampleFinancialData()
+            autoSave()
         }
     }
 
@@ -299,6 +306,12 @@ class AppState {
             println("Error clearing data: ${e.message}")
             showSnackbar("Error: Failed to clear data")
         }
+    }
+
+    // Clear sample data label (user acknowledges data is theirs now)
+    fun clearSampleDataLabel() {
+        data = data.copy(isSampleData = false)
+        showSnackbar("Sample data label removed")
     }
 
     // UI Preferences management

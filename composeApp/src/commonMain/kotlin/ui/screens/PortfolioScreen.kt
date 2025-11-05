@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import model.*
 import randomUUID
+import getCurrentYear
 import ui.components.CurrencyTextField
 
 enum class FutureInvestmentType {
@@ -715,6 +716,3 @@ fun FutureLumpsumDialog(
         }
     )
 }
-
-// Platform-specific function
-expect fun getCurrentYear(): Int
