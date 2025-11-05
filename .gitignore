@@ -3,7 +3,6 @@
 build/
 **/build/
 gradle-app.setting
-!gradle-wrapper.jar
 .gradletasknamecache
 
 # IDEA
@@ -24,6 +23,7 @@ out/
 # Kotlin
 *.class
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.kotlin_module
 
 # Compose
