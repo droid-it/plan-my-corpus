@@ -95,10 +95,11 @@ object SampleData {
                     timeline = GoalTimeline.SHORT_TERM,
                     isEnabled = true
                 ),
+                // Repeating vacation goals every 2 years
                 FinancialGoal(
                     id = "sample-goal-2",
-                    name = "Dream Vacation",
-                    targetAmount = 500000.0,
+                    name = "Vacation 2028",
+                    targetAmount = 300000.0,
                     targetYear = 2028,
                     inflationCategoryId = "general",
                     priority = GoalPriority.GOOD_TO_HAVE,
@@ -107,6 +108,26 @@ object SampleData {
                 ),
                 FinancialGoal(
                     id = "sample-goal-3",
+                    name = "Vacation 2030",
+                    targetAmount = 300000.0,
+                    targetYear = 2030,
+                    inflationCategoryId = "general",
+                    priority = GoalPriority.GOOD_TO_HAVE,
+                    timeline = GoalTimeline.SHORT_TERM,
+                    isEnabled = true
+                ),
+                FinancialGoal(
+                    id = "sample-goal-4",
+                    name = "Vacation 2032",
+                    targetAmount = 300000.0,
+                    targetYear = 2032,
+                    inflationCategoryId = "general",
+                    priority = GoalPriority.GOOD_TO_HAVE,
+                    timeline = GoalTimeline.MEDIUM_TERM,
+                    isEnabled = true
+                ),
+                FinancialGoal(
+                    id = "sample-goal-5",
                     name = "House Down Payment",
                     targetAmount = 3000000.0,
                     targetYear = 2033,
@@ -116,7 +137,27 @@ object SampleData {
                     isEnabled = true
                 ),
                 FinancialGoal(
-                    id = "sample-goal-4",
+                    id = "sample-goal-6",
+                    name = "Vacation 2034",
+                    targetAmount = 300000.0,
+                    targetYear = 2034,
+                    inflationCategoryId = "general",
+                    priority = GoalPriority.GOOD_TO_HAVE,
+                    timeline = GoalTimeline.MEDIUM_TERM,
+                    isEnabled = true
+                ),
+                FinancialGoal(
+                    id = "sample-goal-7",
+                    name = "Vacation 2036",
+                    targetAmount = 300000.0,
+                    targetYear = 2036,
+                    inflationCategoryId = "general",
+                    priority = GoalPriority.GOOD_TO_HAVE,
+                    timeline = GoalTimeline.MEDIUM_TERM,
+                    isEnabled = true
+                ),
+                FinancialGoal(
+                    id = "sample-goal-8",
                     name = "Child's Higher Education",
                     targetAmount = 2500000.0,
                     targetYear = 2040,

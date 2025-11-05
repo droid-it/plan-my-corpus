@@ -82,14 +82,14 @@ fun DashboardScreen(appState: AppState) {
                         Text("• 3 Current Investments (₹${formatAmount(currentCorpus)})", style = MaterialTheme.typography.bodyMedium)
                         Text("• 1 Future Lumpsum Investment", style = MaterialTheme.typography.bodyMedium)
                         Text("• 3 Ongoing Contributions (SIPs)", style = MaterialTheme.typography.bodyMedium)
-                        Text("• 4 Financial Goals", style = MaterialTheme.typography.bodyMedium)
+                        Text("• 8 Financial Goals (including repeating vacations)", style = MaterialTheme.typography.bodyMedium)
                         Text("• Complete user profile", style = MaterialTheme.typography.bodyMedium)
                     }
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                     Text(
-                        text = "Edit any item to make it yours - the sample data flag will be automatically removed. Or clear all data from Settings to start fresh.",
+                        text = "You can edit, add, or delete any items. Click the button below when you're ready to dismiss this sample data notice.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
                     )
@@ -131,6 +131,15 @@ fun DashboardScreen(appState: AppState) {
                         Text("2. Check the Analysis tab for detailed projections", style = MaterialTheme.typography.bodyMedium)
                         Text("3. Modify sample data to match your finances", style = MaterialTheme.typography.bodyMedium)
                         Text("4. Export your snapshot from Settings", style = MaterialTheme.typography.bodyMedium)
+                    }
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                    Button(
+                        onClick = { appState.clearSampleDataLabel() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Got It - This Is My Data Now")
                     }
                 }
             }
