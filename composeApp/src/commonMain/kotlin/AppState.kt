@@ -48,7 +48,7 @@ class AppState {
             "/inflation-rates" -> Screen.InflationRates
             "/investment-categories" -> Screen.InvestmentCategories
             "/portfolio" -> Screen.Portfolio
-            "/contributions" -> Screen.Contributions
+            "/contributions" -> Screen.Portfolio // Redirect old contributions URL to Portfolio
             "/goals" -> Screen.Goals
             "/analysis" -> Screen.Analysis
             "/settings" -> Screen.Settings
@@ -187,6 +187,26 @@ class AppState {
         )
     }
 
+    fun addFutureLumpsumInvestment(investment: FutureLumpsumInvestment) {
+        data = data.copy(futureLumpsumInvestments = data.futureLumpsumInvestments + investment)
+    }
+
+    fun updateFutureLumpsumInvestment(id: String, updated: FutureLumpsumInvestment) {
+        data = data.copy(
+            futureLumpsumInvestments = data.futureLumpsumInvestments.map { if (it.id == id) updated else it }
+        )
+    }
+
+    fun removeFutureLumpsumInvestment(id: String) {
+        data = data.copy(futureLumpsumInvestments = data.futureLumpsumInvestments.filter { it.id != id })
+    }
+
+    fun toggleFutureLumpsumInvestment(id: String) {
+        data = data.copy(
+            futureLumpsumInvestments = data.futureLumpsumInvestments.map { if (it.id == id) it.copy(isEnabled = !it.isEnabled) else it }
+        )
+    }
+
     // JSON export/import
     fun exportToJson(): String {
         val snapshot = data.copy(
@@ -314,7 +334,6 @@ enum class Screen {
     InflationRates,
     InvestmentCategories,
     Portfolio,
-    Contributions,
     Goals,
     Analysis,
     Settings,

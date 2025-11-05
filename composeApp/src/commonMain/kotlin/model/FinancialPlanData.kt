@@ -8,6 +8,7 @@ data class FinancialPlanData(
     val inflationCategories: List<InflationCategory> = DefaultInflationCategories.defaults(),
     val investmentCategories: List<InvestmentCategory> = DefaultInvestmentCategories.defaults(),
     val investments: List<Investment> = emptyList(),
+    val futureLumpsumInvestments: List<FutureLumpsumInvestment> = emptyList(),
     val ongoingContributions: List<OngoingContribution> = emptyList(),
     val goals: List<FinancialGoal> = emptyList(),
     val snapshotTimestamp: Long = 0 // For year-over-year comparison

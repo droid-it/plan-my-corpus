@@ -111,9 +111,9 @@ fun DashboardScreen(appState: AppState) {
                     if (hasNoContributions) {
                         OnboardingItem(
                             icon = Icons.Default.Add,
-                            title = "Add ongoing contributions",
-                            description = "Add your SIPs, PPF, or other recurring investments",
-                            onClick = { appState.currentScreen = Screen.Contributions; updateBrowserUrl(Screen.Contributions) }
+                            title = "Add future investments",
+                            description = "Add your SIPs, PPF, or other planned investments",
+                            onClick = { appState.currentScreen = Screen.Portfolio; updateBrowserUrl(Screen.Portfolio) }
                         )
                     }
                 }

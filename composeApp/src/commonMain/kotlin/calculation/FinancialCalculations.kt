@@ -225,7 +225,25 @@ object FinancialCalculations {
             }
         }
 
-        val totalBeforeWithdrawals = investmentsFV + contributionsFV
+        // Sum all future lumpsum investments' future values (only enabled ones)
+        val futureLumpsumsFV = data.futureLumpsumInvestments.filter { it.isEnabled }.sumOf { investment ->
+            val category = data.investmentCategories.find { it.id == investment.categoryId }
+            if (category != null && investment.plannedYear <= targetYear) {
+                // Investment is made at plannedYear, then grows to targetYear
+                calculateInvestmentFutureValue(
+                    investment.plannedAmount,
+                    investment.plannedYear,
+                    targetYear,
+                    retirementYear,
+                    category.preRetirementXIRR,
+                    postRetirementRate
+                )
+            } else {
+                0.0
+            }
+        }
+
+        val totalBeforeWithdrawals = investmentsFV + contributionsFV + futureLumpsumsFV
 
         // Subtract goal withdrawals that occur before target year
         // For each goal realized before target year, we need to:
