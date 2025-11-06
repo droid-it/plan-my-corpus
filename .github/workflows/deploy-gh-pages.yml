@@ -43,6 +43,8 @@ jobs:
           cp -r composeApp/build/kotlin-webpack/wasmJs/productionExecutable/* deploy/ || true
           # Copy index.html
           cp composeApp/build/processedResources/wasmJs/main/index.html deploy/ || true
+          # Copy 404.html for SPA routing support on GitHub Pages
+          cp composeApp/build/processedResources/wasmJs/main/404.html deploy/ || true
           # Copy skiko runtime files (required for Compose Multiplatform)
           cp composeApp/build/compose/skiko-for-web-runtime/skiko.wasm deploy/ || true
           cp composeApp/build/compose/skiko-for-web-runtime/skiko.mjs deploy/ || true
