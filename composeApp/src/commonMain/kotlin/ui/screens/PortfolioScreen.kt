@@ -232,7 +232,7 @@ fun CurrentPortfolioTab(
                     }
 
                     Text(
-                        text = "We've added sample investments and contributions to help you get started. Check the 'What I'm Planning' tab for future investments. Edit or delete these, and add your own. You can start clean by deleting all data from Settings.",
+                        text = "We've added sample current investments to help you get started. Check the 'What I'm Planning' tab for future lumpsum investments and recurring SIPs. Edit or delete these, and add your own. You can start clean by deleting all data from Settings.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -326,7 +326,7 @@ fun FutureInvestmentsTab(
                     }
 
                     Text(
-                        text = "We've added sample future investments to help you get started. This includes both one-time lumpsum investments and recurring SIPs. Edit or delete these, and add your own. You can start clean by deleting all data from Settings.",
+                        text = "We've added sample future investments to help you get started. This includes both one-time lumpsum investments and recurring SIPs (shown in separate sections below). Edit or delete these, and add your own. You can start clean by deleting all data from Settings.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
