@@ -84,7 +84,7 @@ fun GoalsScreen(appState: AppState) {
                     }
 
                     Text(
-                        text = "We've added sample financial goals including a recurring vacation goal. Feel free to edit, delete, or add your own goals. Visit the Dashboard to remove the sample data label when ready.",
+                        text = "We've added sample financial goals including a recurring vacation goal. Feel free to edit, delete, or add your own goals. You can start clean by deleting all data from Settings.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
