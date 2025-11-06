@@ -37,6 +37,8 @@ class AppState {
         private set
     var sampleDataPortfolioCardDismissed by mutableStateOf(false)
         private set
+    var sampleDataPlanningCardDismissed by mutableStateOf(false)
+        private set
 
     // Snackbar/Toast message state
     var snackbarMessage by mutableStateOf<String?>(null)
@@ -348,6 +350,11 @@ class AppState {
         saveUIPreferences()
     }
 
+    fun dismissSampleDataPlanningCard() {
+        sampleDataPlanningCardDismissed = true
+        saveUIPreferences()
+    }
+
     private fun saveUIPreferences() {
         try {
             PlatformStorage.saveUIPreference("dataStorageBannerDismissed", dataStorageBannerDismissed.toString())
@@ -355,6 +362,7 @@ class AppState {
             PlatformStorage.saveUIPreference("quickStartCardDismissed", quickStartCardDismissed.toString())
             PlatformStorage.saveUIPreference("sampleDataGoalsCardDismissed", sampleDataGoalsCardDismissed.toString())
             PlatformStorage.saveUIPreference("sampleDataPortfolioCardDismissed", sampleDataPortfolioCardDismissed.toString())
+            PlatformStorage.saveUIPreference("sampleDataPlanningCardDismissed", sampleDataPlanningCardDismissed.toString())
         } catch (e: Exception) {
             println("Error saving UI preferences: ${e.message}")
         }
@@ -367,6 +375,7 @@ class AppState {
             quickStartCardDismissed = PlatformStorage.loadUIPreference("quickStartCardDismissed") == "true"
             sampleDataGoalsCardDismissed = PlatformStorage.loadUIPreference("sampleDataGoalsCardDismissed") == "true"
             sampleDataPortfolioCardDismissed = PlatformStorage.loadUIPreference("sampleDataPortfolioCardDismissed") == "true"
+            sampleDataPlanningCardDismissed = PlatformStorage.loadUIPreference("sampleDataPlanningCardDismissed") == "true"
         } catch (e: Exception) {
             println("Error loading UI preferences: ${e.message}")
         }

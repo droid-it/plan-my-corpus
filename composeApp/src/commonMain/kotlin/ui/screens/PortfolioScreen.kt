@@ -232,7 +232,7 @@ fun CurrentPortfolioTab(
                     }
 
                     Text(
-                        text = "We've added sample investments and contributions to help you get started. Check the 'What I'm Planning' tab for future investments. Edit or delete these, and add your own. Visit the Dashboard to remove the sample data label when ready.",
+                        text = "We've added sample investments and contributions to help you get started. Check the 'What I'm Planning' tab for future investments. Edit or delete these, and add your own. You can start clean by deleting all data from Settings.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -281,6 +281,56 @@ fun FutureInvestmentsTab(
         ) {
             FloatingActionButton(onClick = onShowAddDialog) {
                 Icon(Icons.Default.Add, contentDescription = "Add Future Investment")
+            }
+        }
+
+        // Sample Data Card for Planning Tab
+        if (appState.data.isSampleData && !appState.sampleDataPlanningCardDismissed) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = "Sample Future Investments",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                        IconButton(onClick = { appState.dismissSampleDataPlanningCard() }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Dismiss",
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "We've added sample future investments to help you get started. This includes both one-time lumpsum investments and recurring SIPs. Edit or delete these, and add your own. You can start clean by deleting all data from Settings.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
             }
         }
 
