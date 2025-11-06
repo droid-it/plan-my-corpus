@@ -43,8 +43,8 @@ fun DashboardScreen(appState: AppState) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Sample Data Welcome Card
-        if (isSampleData) {
+        // Welcome Card
+        if (!appState.welcomeCardDismissed) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -56,47 +56,51 @@ fun DashboardScreen(appState: AppState) {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Celebration,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                            modifier = Modifier.size(28.dp)
-                        )
-                        Text(
-                            text = "Sample Data Loaded",
-                            style = MaterialTheme.typography.titleLarge
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Celebration,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.size(28.dp)
+                            )
+                            Text(
+                                text = "Welcome to Plan My Corpus",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
+                        IconButton(onClick = { appState.dismissWelcomeCard() }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Dismiss",
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        }
                     }
-                    Text(
-                        text = "We've pre-filled realistic financial data to help you explore features:",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
 
                     Column(
                         modifier = Modifier.padding(start = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text("• 3 Current Investments (₹${formatAmount(currentCorpus)})", style = MaterialTheme.typography.bodyMedium)
-                        Text("• 1 Future Lumpsum Investment", style = MaterialTheme.typography.bodyMedium)
-                        Text("• 3 Ongoing Contributions (SIPs)", style = MaterialTheme.typography.bodyMedium)
-                        Text("• 8 Financial Goals (including repeating vacations)", style = MaterialTheme.typography.bodyMedium)
-                        Text("• Complete user profile", style = MaterialTheme.typography.bodyMedium)
+                        Text("• Track your investments and plan future contributions", style = MaterialTheme.typography.bodyMedium)
+                        Text("• Set financial goals and see if you're on track", style = MaterialTheme.typography.bodyMedium)
+                        Text("• Account for inflation and retirement planning", style = MaterialTheme.typography.bodyMedium)
+                        if (isSampleData) {
+                            Text("• Sample data has been added to help you get started", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                        }
                     }
-
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-                    Text(
-                        text = "You can edit, add, or delete any items. Click the button below when you're ready to dismiss this sample data notice.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
-                    )
                 }
             }
+        }
 
-            // Quick Start Guide Card
+        // Quick Start Guide Card
+        if (!appState.quickStartCardDismissed) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -108,19 +112,32 @@ fun DashboardScreen(appState: AppState) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = "Quick Start Guide",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = "Quick Start Guide",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                        IconButton(onClick = { appState.dismissQuickStartCard() }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Dismiss",
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
                     }
 
                     Column(
@@ -128,18 +145,9 @@ fun DashboardScreen(appState: AppState) {
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text("1. Review your corpus health below", style = MaterialTheme.typography.bodyMedium)
-                        Text("2. Check the Analysis tab for detailed projections", style = MaterialTheme.typography.bodyMedium)
-                        Text("3. Modify sample data to match your finances", style = MaterialTheme.typography.bodyMedium)
-                        Text("4. Export your snapshot from Settings", style = MaterialTheme.typography.bodyMedium)
-                    }
-
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-                    Button(
-                        onClick = { appState.clearSampleDataLabel() },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Got It - This Is My Data Now")
+                        Text("2. Add or edit your Portfolio and Goals", style = MaterialTheme.typography.bodyMedium)
+                        Text("3. Check the Analysis tab for detailed projections", style = MaterialTheme.typography.bodyMedium)
+                        Text("4. Export your snapshot from Settings for tracking", style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }
