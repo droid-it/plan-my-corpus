@@ -12,6 +12,9 @@ private external fun jsPushState(path: String)
 @JsFun("() => window.location.pathname")
 private external fun jsGetPath(): String
 
+@JsFun("() => { const path = window.location.pathname; const segments = path.split('/').filter(s => s); return segments.length > 0 && !['profile', 'inflation-rates', 'investment-categories', 'portfolio', 'contributions', 'goals', 'analysis', 'settings', 'about'].includes(segments[0]) ? '/' + segments[0] : ''; }")
+private external fun jsGetBasePath(): String
+
 actual fun getCurrentYear(): Int {
     return jsGetFullYear()
 }
@@ -35,7 +38,8 @@ actual fun randomUUID(): String {
 }
 
 actual fun updateBrowserUrl(screen: Screen) {
-    val path = when (screen) {
+    val basePath = jsGetBasePath()
+    val screenPath = when (screen) {
         Screen.Dashboard -> "/"
         Screen.UserProfile -> "/profile"
         Screen.InflationRates -> "/inflation-rates"
@@ -46,11 +50,24 @@ actual fun updateBrowserUrl(screen: Screen) {
         Screen.Settings -> "/settings"
         Screen.About -> "/about"
     }
-    jsPushState(path)
+    val fullPath = if (basePath.isEmpty() || screenPath == "/") {
+        basePath + screenPath
+    } else {
+        basePath + screenPath
+    }
+    jsPushState(fullPath)
 }
 
 actual fun getBrowserPath(): String {
-    return jsGetPath()
+    val fullPath = jsGetPath()
+    val basePath = jsGetBasePath()
+
+    // Strip base path to get the app route
+    return if (basePath.isNotEmpty() && fullPath.startsWith(basePath)) {
+        fullPath.substring(basePath.length).ifEmpty { "/" }
+    } else {
+        fullPath
+    }
 }
 
 @JsFun("() => { const now = new Date(); const year = now.getFullYear(); const month = String(now.getMonth() + 1).padStart(2, '0'); const day = String(now.getDate()).padStart(2, '0'); return year + '-' + month + '-' + day; }")
