@@ -307,7 +307,8 @@ class AppState {
             // Clear financial data from localStorage
             PlatformStorage.clearLocalStorage()
             // Reset to default empty data
-            _data = FinancialPlanData()
+            // Use 'data' setter (not '_data') to trigger autoSave() and persist the empty state
+            data = FinancialPlanData()
             // Keep UI preferences (like banner dismissal) but could clear if needed
             showSnackbar("All data cleared successfully")
         } catch (e: Exception) {
