@@ -25,6 +25,7 @@ out/
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
 *.kotlin_module
+.kotlin/
 
 # Compose
 composeResources/
@@ -37,3 +38,4 @@ package-lock.json
 dist/
 webpack/
 kotlin-js-store/
+deploy/
