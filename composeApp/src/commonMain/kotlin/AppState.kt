@@ -44,6 +44,10 @@ class AppState {
     var snackbarMessage by mutableStateOf<String?>(null)
         private set
 
+    // Dialog trigger flags for navigation from quick start guide
+    var shouldOpenAddGoalDialog by mutableStateOf(false)
+    var shouldOpenAddInvestmentDialog by mutableStateOf(false)
+
     init {
         // Load data from localStorage on init
         loadFromStorage()
@@ -84,6 +88,22 @@ class AppState {
             currentScreen = Screen.Settings
             updateBrowserUrl(Screen.Settings)
         }
+    }
+
+    // Navigation with dialog trigger
+    fun navigateToAddGoal() {
+        shouldOpenAddGoalDialog = true
+        navigateTo(Screen.Goals)
+    }
+
+    fun navigateToAddInvestment() {
+        shouldOpenAddInvestmentDialog = true
+        navigateTo(Screen.Portfolio)
+    }
+
+    fun clearDialogTriggers() {
+        shouldOpenAddGoalDialog = false
+        shouldOpenAddInvestmentDialog = false
     }
 
     // Computed analysis - recalculated whenever data changes

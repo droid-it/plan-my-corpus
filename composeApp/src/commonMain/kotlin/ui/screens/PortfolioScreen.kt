@@ -34,6 +34,14 @@ fun PortfolioScreen(appState: AppState) {
     var editingFutureLumpsum by remember { mutableStateOf<FutureLumpsumInvestment?>(null) }
     var editingContribution by remember { mutableStateOf<OngoingContribution?>(null) }
 
+    // Handle auto-open from quick start guide
+    LaunchedEffect(appState.shouldOpenAddInvestmentDialog) {
+        if (appState.shouldOpenAddInvestmentDialog) {
+            showAddCurrentDialog = true
+            appState.clearDialogTriggers()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
