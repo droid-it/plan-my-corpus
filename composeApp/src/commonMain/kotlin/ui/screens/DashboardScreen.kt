@@ -156,13 +156,13 @@ fun DashboardScreen(appState: AppState) {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Button(
-                                onClick = { appState.navigateToAddGoal() },
+                                onClick = { appState.navigateTo(Screen.Goals) },
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text("Add Goal")
                             }
                             Button(
-                                onClick = { appState.navigateToAddInvestment() },
+                                onClick = { appState.navigateTo(Screen.Portfolio) },
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text("Add Investment")
