@@ -26,6 +26,14 @@ fun GoalsScreen(appState: AppState) {
     var showAddDialog by remember { mutableStateOf(false) }
     var editingGoal by remember { mutableStateOf<FinancialGoal?>(null) }
 
+    // Handle auto-open from quick start guide
+    LaunchedEffect(appState.shouldOpenAddGoalDialog) {
+        if (appState.shouldOpenAddGoalDialog) {
+            showAddDialog = true
+            appState.clearDialogTriggers()
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

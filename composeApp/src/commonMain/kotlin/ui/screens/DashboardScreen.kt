@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.Celebration
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -145,9 +146,72 @@ fun DashboardScreen(appState: AppState) {
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text("1. Review your corpus health below", style = MaterialTheme.typography.bodyMedium)
-                        Text("2. Add or edit your Portfolio and Goals", style = MaterialTheme.typography.bodyMedium)
-                        Text("3. Check the Analysis tab for detailed projections", style = MaterialTheme.typography.bodyMedium)
-                        Text("4. Export your snapshot from Settings for tracking", style = MaterialTheme.typography.bodyMedium)
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("2.", style = MaterialTheme.typography.bodyMedium)
+                            TextButton(
+                                onClick = { appState.navigateToAddGoal() },
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                            ) {
+                                Text("Add your first goal", style = MaterialTheme.typography.bodyMedium)
+                                Icon(
+                                    imageVector = Icons.Default.ArrowForward,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp).padding(start = 4.dp)
+                                )
+                            }
+                            Text("or", style = MaterialTheme.typography.bodyMedium)
+                            TextButton(
+                                onClick = { appState.navigateToAddInvestment() },
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                            ) {
+                                Text("Add an investment", style = MaterialTheme.typography.bodyMedium)
+                                Icon(
+                                    imageVector = Icons.Default.ArrowForward,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp).padding(start = 4.dp)
+                                )
+                            }
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("3.", style = MaterialTheme.typography.bodyMedium)
+                            TextButton(
+                                onClick = { appState.navigateTo(Screen.UserProfile) },
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                            ) {
+                                Text("Update your profile", style = MaterialTheme.typography.bodyMedium)
+                                Icon(
+                                    imageVector = Icons.Default.ArrowForward,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp).padding(start = 4.dp)
+                                )
+                            }
+                        }
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("4.", style = MaterialTheme.typography.bodyMedium)
+                            TextButton(
+                                onClick = { appState.navigateTo(Screen.Analysis) },
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                            ) {
+                                Text("View detailed projections", style = MaterialTheme.typography.bodyMedium)
+                                Icon(
+                                    imageVector = Icons.Default.ArrowForward,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp).padding(start = 4.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
