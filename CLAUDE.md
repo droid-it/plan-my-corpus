@@ -604,9 +604,108 @@ Returns `FinancialAnalysis` containing:
   4. Implement side-by-side chart visualization
   5. Add detailed comparison tables
 
+#### 5. Liability Management & Net Worth Tracking
+- [ ] **Goal**: Account for liabilities (loans, mortgages, debt) in corpus planning and net worth calculations
+- [ ] **Scope**: Track debts, their impact on cash flow, and net worth over time
+- [ ] **Rationale**:
+  - Current model tracks only assets (investments, contributions) and goals
+  - Real financial health requires net worth view (assets - liabilities)
+  - Loan payments reduce available cash flow for new contributions
+  - Debt payoff is often a critical financial goal
+  - Interest paid on debt reduces effective investment returns
+  - Retirement planning should account for becoming debt-free
+- [ ] **Data Model Changes**:
+  ```kotlin
+  @Serializable
+  data class Liability(
+      val id: String,
+      val name: String,                    // e.g., "Home Loan", "Car Loan", "Credit Card"
+      val type: LiabilityType,             // MORTGAGE, PERSONAL_LOAN, VEHICLE_LOAN, CREDIT_CARD, OTHER
+      val principalOutstanding: Double,    // Current outstanding amount
+      val interestRate: Double,            // Annual interest rate %
+      val emiAmount: Double,               // Monthly payment amount
+      val startDate: String,               // Loan start date (ISO format)
+      val endDate: String,                 // Expected payoff date
+      val isEnabled: Boolean = true        // Include in calculations
+  )
+
+  enum class LiabilityType {
+      MORTGAGE,
+      PERSONAL_LOAN,
+      VEHICLE_LOAN,
+      EDUCATION_LOAN,
+      CREDIT_CARD,
+      OTHER
+  }
+
+  // Add to FinancialPlanData:
+  val liabilities: List<Liability> = emptyList()
+  ```
+- [ ] **Key Calculations**:
+  - **Net Worth Calculation**: Total Assets - Total Liabilities
+  - **Effective Cash Flow**: Available monthly income after EMI payments
+  - **Total Interest Burden**: Sum of interest paid over loan tenure
+  - **Debt-Free Date**: When all liabilities will be paid off
+  - **Liability Amortization Schedule**: Year-by-year principal vs interest breakdown
+  - **Impact on Contributions**: How pre-paying debt affects available SIP capacity
+  - **Opportunity Cost**: Investment returns lost due to debt service
+- [ ] **UI Features**:
+  - New "Liabilities" screen (full CRUD)
+    - Add/edit/delete liabilities
+    - View amortization schedule per liability
+    - Enable/disable toggle for scenario testing
+    - Total EMI burden summary
+  - Dashboard enhancements:
+    - Net Worth card (Assets - Liabilities)
+    - Debt-to-Asset ratio
+    - Monthly EMI burden vs available cash flow
+    - Debt-Free milestone indicator
+  - Analysis screen updates:
+    - Net worth projection chart (assets and liabilities on same timeline)
+    - "Should I pre-pay?" calculator comparing:
+      - Pre-paying loan vs investing the amount
+      - Interest saved vs potential investment returns
+    - Liability payoff timeline visualization
+  - New "Debt Goals" feature:
+    - Option to add "Pay off [Loan Name]" as a financial goal
+    - Auto-calculate lump sum needed for early closure
+    - Show interest savings from pre-payment
+- [ ] **Strategic Insights**:
+  - Alert when debt-to-asset ratio exceeds healthy threshold (e.g., >40%)
+  - Suggest optimal debt payoff vs investment strategy based on:
+    - Loan interest rate vs expected investment returns
+    - Tax benefits (e.g., home loan interest deduction)
+    - Liquidity needs
+  - Retirement readiness check: Flag if liabilities extend beyond retirement age
+  - High-interest debt prioritization (avalanche method recommendation)
+- [ ] **Implementation Considerations**:
+  - Should EMI payments reduce available contribution capacity automatically?
+    - Option 1: User manually accounts for EMIs when setting contribution amounts
+    - Option 2: System auto-calculates "available for investment" after EMI deductions
+    - Option 3: Hybrid - show both gross and net available cash flow
+  - How to handle refinancing scenarios?
+    - Allow editing liability terms mid-tenure
+    - Track refinancing history in metadata
+  - Should liabilities be linked to specific assets?
+    - E.g., Home loan linked to property value (not currently tracked)
+    - May require adding "Physical Assets" module (property, vehicles)
+  - Tax implications of loan interest (especially home loans in India)
+    - Deductible interest reduces effective interest rate
+    - May need tax calculation module integration
+- [ ] **Implementation Order**:
+  1. Create `model/Liability.kt` with data model
+  2. Add amortization calculation functions to `calculation/FinancialCalculations.kt`
+  3. Create `calculation/NetWorthAnalyzer.kt` for net worth and debt analytics
+  4. Update `FinancialPlanData` and serialization
+  5. Create `ui/screens/LiabilitiesScreen.kt` with full CRUD
+  6. Update Dashboard to show net worth and debt metrics
+  7. Enhance Analysis screen with net worth projections
+  8. Add pre-payment calculator and strategic insights
+
 ### Future Enhancements (Lower Priority)
 - [ ] Multi-currency support
-- [ ] Tax calculations
+- [ ] Tax calculations (integrate with liability interest deductions)
+- [ ] Physical asset tracking (property, vehicles) to match with liabilities
 - [ ] Asset allocation recommendations
 - [ ] Monte Carlo simulations
 - [ ] Dark mode
