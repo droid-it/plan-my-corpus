@@ -92,6 +92,7 @@ fun DashboardScreen(appState: AppState) {
                         Text("• Track your investments and plan future contributions", style = MaterialTheme.typography.bodyMedium)
                         Text("• Set financial goals and see if you're on track", style = MaterialTheme.typography.bodyMedium)
                         Text("• Account for inflation and retirement planning", style = MaterialTheme.typography.bodyMedium)
+                        Text("• All data stored locally in your browser - see Settings for details", style = MaterialTheme.typography.bodyMedium)
                         if (isSampleData) {
                             Text("• Sample data has been added to help you get started", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                         }
