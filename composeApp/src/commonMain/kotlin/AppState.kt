@@ -425,3 +425,4 @@ expect fun randomUUID(): String
 expect fun updateBrowserUrl(screen: Screen)
 expect fun getBrowserPath(): String
 expect fun formatDateForFilename(): String
+expect fun hideLoader()

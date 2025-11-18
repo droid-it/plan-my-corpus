@@ -76,3 +76,10 @@ private external fun jsFormatDate(): String
 actual fun formatDateForFilename(): String {
     return jsFormatDate()
 }
+
+@JsFun("() => { const loader = document.getElementById('loading'); if (loader) { loader.style.display = 'none'; } }")
+private external fun jsHideLoader()
+
+actual fun hideLoader() {
+    jsHideLoader()
+}
