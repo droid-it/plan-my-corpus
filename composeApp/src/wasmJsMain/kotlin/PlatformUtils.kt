@@ -77,6 +77,10 @@ actual fun formatDateForFilename(): String {
     return jsFormatDate()
 }
 
+actual fun getCurrentDateISO(): String {
+    return jsFormatDate() // Same format as formatDateForFilename (YYYY-MM-DD)
+}
+
 @JsFun("() => { const loader = document.getElementById('loading'); if (loader) { loader.style.display = 'none'; } }")
 private external fun jsHideLoader()
 

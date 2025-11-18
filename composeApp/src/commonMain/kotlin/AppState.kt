@@ -6,20 +6,61 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import storage.PlatformStorage
+import migration.DataMigration
 
 /**
  * Main application state container
+ * Version 2.0: Now supports multi-year tracking
  */
 class AppState {
-    private var _data by mutableStateOf(FinancialPlanData())
+    // Internal multi-year data structure
+    private var _multiYearData by mutableStateOf<MultiYearFinancialPlan?>(null)
 
+    // Selected year for viewing/editing
+    var selectedYear by mutableStateOf(getCurrentYear())
+        private set
+
+    // Backward-compatible data property - exposes current year's snapshot as FinancialPlanData
     var data: FinancialPlanData
-        get() = _data
+        get() = DataMigration.multiYearToLegacy(
+            _multiYearData ?: createEmptyMultiYearPlan()
+        )
         private set(value) {
-            _data = value
+            // Convert single snapshot to multi-year format
+            _multiYearData = DataMigration.migrateLegacyToMultiYear(value)
             // Auto-save to localStorage on every change
             autoSave()
         }
+
+    // Multi-year data accessor (for future year-aware features)
+    val multiYearData: MultiYearFinancialPlan
+        get() = _multiYearData ?: createEmptyMultiYearPlan()
+
+    private fun createEmptyMultiYearPlan(): MultiYearFinancialPlan {
+        val year = getCurrentYear()
+        val date = getCurrentDateISO()
+        return MultiYearFinancialPlan(
+            version = "2.0",
+            userProfile = UserProfile(),
+            inflationCategories = DefaultInflationCategories.defaults(),
+            investmentCategories = DefaultInvestmentCategories.defaults(),
+            yearlySnapshots = listOf(
+                YearlySnapshot(
+                    year = year,
+                    snapshotDate = date,
+                    snapshotType = SnapshotType.CURRENT,
+                    investments = emptyList(),
+                    futureLumpsumInvestments = emptyList(),
+                    ongoingContributions = emptyList(),
+                    goals = emptyList()
+                )
+            ),
+            currentYear = year,
+            baselineYear = year,
+            exportTimestamp = currentTimeMillis(),
+            metadata = ExportMetadata()
+        )
+    }
 
     var currentScreen by mutableStateOf(getInitialScreen())
         internal set
@@ -237,20 +278,35 @@ class AppState {
         )
     }
 
-    // JSON export/import
+    // JSON export/import (v2.0 format with backward compatibility)
     fun exportToJson(): String {
-        val snapshot = data.copy(
-            snapshotTimestamp = currentTimeMillis()
-        )
-        return Json.encodeToString(snapshot)
+        return try {
+            val multiYear = _multiYearData ?: createEmptyMultiYearPlan()
+            val updated = multiYear.copy(
+                exportTimestamp = currentTimeMillis(),
+                metadata = multiYear.metadata.copy(
+                    exportDate = getCurrentDateISO(),
+                    totalYears = multiYear.yearlySnapshots.size
+                )
+            )
+            DataMigration.exportFinancialPlan(updated)
+        } catch (e: Exception) {
+            println("Error exporting to JSON: ${e.message}")
+            // Fallback to legacy export
+            Json.encodeToString(data)
+        }
     }
 
     fun importFromJson(json: String): Boolean {
         return try {
-            data = Json { ignoreUnknownKeys = true }.decodeFromString<FinancialPlanData>(json)
+            // Use DataMigration to automatically handle v1.0 and v2.0 formats
+            val imported = DataMigration.importFinancialPlan(json)
+            _multiYearData = imported
+            selectedYear = imported.currentYear
             true
         } catch (e: Exception) {
             println("Error importing JSON: ${e.message}")
+            println("Stack trace: ${e.stackTraceToString()}")
             false
         }
     }
@@ -259,10 +315,16 @@ class AppState {
         data = planData
     }
 
-    // Storage operations
+    fun loadMultiYearData(multiYear: MultiYearFinancialPlan) {
+        _multiYearData = multiYear
+        selectedYear = multiYear.currentYear
+        autoSave()
+    }
+
+    // Storage operations (v2.0 format with backward compatibility)
     private fun autoSave() {
         try {
-            val json = Json.encodeToString(data)
+            val json = exportToJson()
             PlatformStorage.saveToLocalStorage(json)
         } catch (e: Exception) {
             println("Error auto-saving: ${e.message}")
@@ -273,10 +335,15 @@ class AppState {
         try {
             val json = PlatformStorage.loadFromLocalStorage()
             if (json != null) {
-                _data = Json { ignoreUnknownKeys = true }.decodeFromString<FinancialPlanData>(json)
+                // Import using migration logic to handle both v1.0 and v2.0
+                val imported = DataMigration.importFinancialPlan(json)
+                _multiYearData = imported
+                selectedYear = imported.currentYear
             } else {
                 // First-time user: load sample data
-                _data = model.SampleData.createSampleFinancialData()
+                val sampleData = model.SampleData.createSampleFinancialData()
+                _multiYearData = DataMigration.migrateLegacyToMultiYear(sampleData)
+                selectedYear = _multiYearData?.currentYear ?: getCurrentYear()
                 // Auto-save the sample data
                 autoSave()
             }
@@ -285,7 +352,9 @@ class AppState {
             println("Stack trace: ${e.stackTraceToString()}")
             // Clear corrupted data and load sample data
             PlatformStorage.clearLocalStorage()
-            _data = model.SampleData.createSampleFinancialData()
+            val sampleData = model.SampleData.createSampleFinancialData()
+            _multiYearData = DataMigration.migrateLegacyToMultiYear(sampleData)
+            selectedYear = _multiYearData?.currentYear ?: getCurrentYear()
             autoSave()
         }
     }
@@ -329,8 +398,9 @@ class AppState {
             // Clear financial data from localStorage
             PlatformStorage.clearLocalStorage()
             // Reset to default empty data
-            // Use 'data' setter (not '_data') to trigger autoSave() and persist the empty state
-            data = FinancialPlanData()
+            _multiYearData = createEmptyMultiYearPlan()
+            selectedYear = getCurrentYear()
+            autoSave()
             // Keep UI preferences (like banner dismissal) but could clear if needed
             showSnackbar("All data cleared successfully")
         } catch (e: Exception) {
@@ -341,8 +411,28 @@ class AppState {
 
     // Clear sample data label (user acknowledges data is theirs now)
     fun clearSampleDataLabel() {
-        data = data.copy(isSampleData = false)
+        _multiYearData = _multiYearData?.copy(isSampleData = false) ?: createEmptyMultiYearPlan()
+        autoSave()
         showSnackbar("Sample data label removed")
+    }
+
+    // Year selection (for future multi-year features)
+    fun selectYear(year: Int) {
+        val snapshot = multiYearData.yearlySnapshots.find { it.year == year }
+        if (snapshot != null) {
+            selectedYear = year
+            showSnackbar("Viewing data for year $year")
+        } else {
+            showSnackbar("No data available for year $year")
+        }
+    }
+
+    // Add a new yearly snapshot
+    fun addYearlySnapshot(snapshot: YearlySnapshot) {
+        _multiYearData = _multiYearData?.copy(
+            yearlySnapshots = (multiYearData.yearlySnapshots + snapshot).sortedBy { it.year }
+        )
+        autoSave()
     }
 
     // UI Preferences management
@@ -425,4 +515,5 @@ expect fun randomUUID(): String
 expect fun updateBrowserUrl(screen: Screen)
 expect fun getBrowserPath(): String
 expect fun formatDateForFilename(): String
+expect fun getCurrentDateISO(): String
 expect fun hideLoader()
