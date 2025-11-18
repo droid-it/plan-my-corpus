@@ -28,6 +28,12 @@ fun UserProfileScreen(appState: AppState) {
         var postRetirementGrowthRate by remember { mutableStateOf(appState.data.userProfile.postRetirementGrowthRate.toString()) }
         var selectedInflationCategoryId by remember { mutableStateOf(appState.data.userProfile.expenseInflationCategoryId) }
         var expandedDropdown by remember { mutableStateOf(false) }
+        var showAdvancedOptions by remember {
+            mutableStateOf(
+                appState.data.userProfile.postRetirementGrowthRate != 10.0 ||
+                appState.data.userProfile.expenseInflationCategoryId != "general"
+            )
+        }
 
         OutlinedTextField(
             value = currentAge,
@@ -58,43 +64,103 @@ fun UserProfileScreen(appState: AppState) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
-            value = postRetirementGrowthRate,
-            onValueChange = { postRetirementGrowthRate = it },
-            label = { Text("Post-Retirement Growth Rate (%)") },
-            supportingText = { Text("Expected annual return on entire corpus after retirement") },
-            modifier = Modifier.fillMaxWidth()
-        )
+        // Advanced options toggle
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-        ExposedDropdownMenuBox(
-            expanded = expandedDropdown,
-            onExpandedChange = { expandedDropdown = it }
+        TextButton(
+            onClick = { showAdvancedOptions = !showAdvancedOptions },
+            modifier = Modifier.fillMaxWidth()
         ) {
-            OutlinedTextField(
-                value = appState.data.inflationCategories.find { it.id == selectedInflationCategoryId }?.name ?: "",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Expense Inflation Category") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDropdown) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor()
-            )
-            ExposedDropdownMenu(
-                expanded = expandedDropdown,
-                onDismissRequest = { expandedDropdown = false }
+            Text(if (showAdvancedOptions) "Hide Advanced Options" else "Show Advanced Options")
+        }
+
+        if (showAdvancedOptions) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                appState.data.inflationCategories.forEach { category ->
-                    DropdownMenuItem(
-                        text = { Text("${category.name} (${category.rate}%)") },
-                        onClick = {
-                            selectedInflationCategoryId = category.id
-                            expandedDropdown = false
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        "Advanced Options",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+
+                    OutlinedTextField(
+                        value = postRetirementGrowthRate,
+                        onValueChange = { postRetirementGrowthRate = it },
+                        label = { Text("Post-Retirement Growth Rate (%)") },
+                        supportingText = { Text("Expected annual return on entire corpus after retirement (default: 10%)") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    ExposedDropdownMenuBox(
+                        expanded = expandedDropdown,
+                        onExpandedChange = { expandedDropdown = it }
+                    ) {
+                        OutlinedTextField(
+                            value = appState.data.inflationCategories.find { it.id == selectedInflationCategoryId }?.name ?: "",
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Expense Inflation Category") },
+                            supportingText = { Text("Inflation rate for your monthly expenses (default: General)") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDropdown) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedDropdown,
+                            onDismissRequest = { expandedDropdown = false }
+                        ) {
+                            appState.data.inflationCategories.forEach { category ->
+                                DropdownMenuItem(
+                                    text = { Text("${category.name} (${category.rate}%)") },
+                                    onClick = {
+                                        selectedInflationCategoryId = category.id
+                                        expandedDropdown = false
+                                    }
+                                )
+                            }
                         }
+                    }
+                }
+            }
+        } else {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        "Using smart defaults:",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        "• Post-retirement growth: ${postRetirementGrowthRate}%",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    val expenseCategoryName = appState.data.inflationCategories.find { it.id == selectedInflationCategoryId }?.name ?: "General"
+                    val expenseCategoryRate = appState.data.inflationCategories.find { it.id == selectedInflationCategoryId }?.rate ?: 6.0
+                    Text(
+                        "• Expense inflation: $expenseCategoryName ($expenseCategoryRate%)",
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
         }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
         Button(
             onClick = {

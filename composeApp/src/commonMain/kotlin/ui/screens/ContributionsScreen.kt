@@ -180,6 +180,7 @@ fun ContributionDialog(
     var stepUpPercentage by remember { mutableStateOf(contribution?.stepUpPercentage?.toString() ?: "0") }
     var selectedFrequency by remember { mutableStateOf(contribution?.frequency ?: ContributionFrequency.MONTHLY) }
     var selectedCategoryId by remember { mutableStateOf(contribution?.categoryId ?: categories.firstOrNull()?.id ?: "") }
+    var showAdvancedOptions by remember { mutableStateOf(contribution?.durationYears != null || (contribution?.stepUpPercentage ?: 0.0) > 0.0) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -225,22 +226,6 @@ fun ContributionDialog(
                     onValueChange = { amount = it },
                     label = "Amount per Period",
                     supportingText = { Text("Amount you contribute per payment period") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = durationYears,
-                    onValueChange = { durationYears = it },
-                    label = { Text("Duration (years)") },
-                    supportingText = { Text("Leave empty to continue until retirement") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = stepUpPercentage,
-                    onValueChange = { stepUpPercentage = it },
-                    label = { Text("Annual Step-up (%)") },
-                    supportingText = { Text("Yearly increase in contribution (e.g., 10 for 10%)") },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -301,6 +286,51 @@ fun ContributionDialog(
                                     selectedCategoryId = category.id
                                     expandedCategory = false
                                 }
+                            )
+                        }
+                    }
+                }
+
+                // Advanced options toggle
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                TextButton(
+                    onClick = { showAdvancedOptions = !showAdvancedOptions },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (showAdvancedOptions) "Hide Advanced Options" else "Show Advanced Options")
+                }
+
+                if (showAdvancedOptions) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                "Advanced Options",
+                                style = MaterialTheme.typography.titleSmall
+                            )
+
+                            OutlinedTextField(
+                                value = durationYears,
+                                onValueChange = { durationYears = it },
+                                label = { Text("Duration (years)") },
+                                supportingText = { Text("Leave empty to continue until retirement") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            OutlinedTextField(
+                                value = stepUpPercentage,
+                                onValueChange = { stepUpPercentage = it },
+                                label = { Text("Annual Step-up (%)") },
+                                supportingText = { Text("Yearly increase in contribution (e.g., 10 for 10%)") },
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }

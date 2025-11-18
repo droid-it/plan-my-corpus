@@ -21,6 +21,18 @@ import ui.components.CurrencyTextField
 import getCurrentYear
 import kotlin.math.pow
 
+/**
+ * Auto-assign timeline based on target year
+ */
+private fun autoAssignTimeline(targetYear: Int, currentYear: Int): GoalTimeline {
+    val years = targetYear - currentYear
+    return when {
+        years <= 5 -> GoalTimeline.SHORT_TERM
+        years <= 10 -> GoalTimeline.MEDIUM_TERM
+        else -> GoalTimeline.LONG_TERM
+    }
+}
+
 @Composable
 fun GoalsScreen(appState: AppState) {
     var showAddDialog by remember { mutableStateOf(false) }
@@ -262,7 +274,6 @@ fun GoalDialog(
     var targetYear by remember { mutableStateOf(goal?.targetYear?.toString() ?: "") }
     var selectedInflationCategoryId by remember { mutableStateOf(goal?.inflationCategoryId ?: inflationCategories.firstOrNull()?.id ?: "") }
     var selectedPriority by remember { mutableStateOf(goal?.priority ?: GoalPriority.MUST_HAVE) }
-    var selectedTimeline by remember { mutableStateOf(goal?.timeline ?: GoalTimeline.LONG_TERM) }
     var isRecurring by remember { mutableStateOf(goal?.isRecurring ?: false) }
     var recurringFrequencyMonths by remember { mutableStateOf(goal?.recurringFrequencyMonths?.toString() ?: "12") }
     var recurringStartAge by remember { mutableStateOf(goal?.recurringStartAge?.toString() ?: appState.data.userProfile.currentAge.toString()) }
@@ -413,37 +424,6 @@ fun GoalDialog(
                     }
                 }
 
-                // Timeline dropdown
-                var expandedTimeline by remember { mutableStateOf(false) }
-                ExposedDropdownMenuBox(
-                    expanded = expandedTimeline,
-                    onExpandedChange = { expandedTimeline = it }
-                ) {
-                    OutlinedTextField(
-                        value = selectedTimeline.name,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Timeline") },
-                        supportingText = { Text("Helps categorize your goals by timeframe") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTimeline) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expandedTimeline,
-                        onDismissRequest = { expandedTimeline = false }
-                    ) {
-                        GoalTimeline.entries.forEach { timeline ->
-                            DropdownMenuItem(
-                                text = { Text(timeline.name) },
-                                onClick = {
-                                    selectedTimeline = timeline
-                                    expandedTimeline = false
-                                }
-                            )
-                        }
-                    }
-                }
-
                 // Inflation category dropdown
                 var expandedInflation by remember { mutableStateOf(false) }
                 ExposedDropdownMenuBox(
@@ -487,6 +467,9 @@ fun GoalDialog(
                         targetYear.toIntOrNull() ?: 2030
                     }
 
+                    // Auto-assign timeline based on target year
+                    val autoTimeline = autoAssignTimeline(effectiveTargetYear, getCurrentYear())
+
                     val newGoal = FinancialGoal(
                         id = goal?.id ?: randomUUID(),
                         name = name,
@@ -494,7 +477,7 @@ fun GoalDialog(
                         targetYear = effectiveTargetYear,
                         inflationCategoryId = selectedInflationCategoryId,
                         priority = selectedPriority,
-                        timeline = selectedTimeline,
+                        timeline = autoTimeline,
                         isRecurring = isRecurring,
                         recurringFrequencyMonths = recurringFrequencyMonths.toIntOrNull() ?: 12,
                         recurringStartAge = if (isRecurring) recurringStartAge.toIntOrNull() else null,
