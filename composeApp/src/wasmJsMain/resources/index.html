@@ -84,13 +84,6 @@
     </script>
     <script src="composeApp.js" onerror="document.getElementById('error').innerHTML='Failed to load composeApp.js'; document.getElementById('error').style.display='block';"></script>
     <script>
-        // Hide loading message after a delay if app loaded successfully
-        setTimeout(function() {
-            if (document.getElementById('ComposeTarget').getContext) {
-                document.getElementById('loading').style.display = 'none';
-            }
-        }, 3000);
-
         // Safari keyboard scroll fix
         (function() {
             let focusedElement = null;

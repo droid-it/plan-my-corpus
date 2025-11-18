@@ -19,6 +19,11 @@ fun App() {
     val appState = remember { AppState() }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    // Hide loader after first composition
+    LaunchedEffect(Unit) {
+        hideLoader()
+    }
+
     // Show snackbar when message is available
     LaunchedEffect(appState.snackbarMessage) {
         appState.snackbarMessage?.let { message ->
