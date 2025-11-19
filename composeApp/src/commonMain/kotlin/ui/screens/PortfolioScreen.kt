@@ -727,10 +727,9 @@ fun InvestmentDialog(
                         horizontalArrangement = Arrangement.Start,
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
-                        Icon(
-                            if (showAdvanced) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                        Text(
+                            text = if (showAdvanced) "▲" else "▼",
+                            style = MaterialTheme.typography.bodySmall
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(

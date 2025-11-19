@@ -248,9 +248,9 @@ fun DashboardScreen(appState: AppState) {
                         style = MaterialTheme.typography.titleMedium
                     )
                     IconButton(onClick = { isRetirementExpanded = !isRetirementExpanded }) {
-                        Icon(
-                            imageVector = if (isRetirementExpanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                            contentDescription = if (isRetirementExpanded) "Collapse" else "Expand"
+                        Text(
+                            text = if (isRetirementExpanded) "▲" else "▼",
+                            style = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
