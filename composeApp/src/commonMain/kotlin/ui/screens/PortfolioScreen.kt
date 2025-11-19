@@ -626,7 +626,10 @@ fun InvestmentDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (investment == null) "Add Current Investment" else "Edit Investment") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 // Show info card for first investment
                 if (isFirstInvestment && investment == null) {
                     Card(
@@ -829,7 +832,10 @@ fun FutureLumpsumDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (investment == null) "Add Future Lumpsum Investment" else "Edit Future Lumpsum") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
