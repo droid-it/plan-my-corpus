@@ -29,7 +29,7 @@ A comprehensive financial planning tool that helps users:
    - Full CRUD operations on inflation categories
 
 3. **Investment Tracking**
-   - Current portfolio with actual XIRR (historical returns) per investment
+   - Current portfolio using expected XIRR from investment category
    - Investment categories with expected XIRR for future growth
    - Different growth rates for pre-retirement vs post-retirement periods
    - Ongoing contributions with:
@@ -175,7 +175,6 @@ data class Investment(
     val name: String,
     val currentValue: Double,
     val categoryId: String,
-    val actualXIRR: Double,        // Historical return %
     val isEnabled: Boolean = true  // Include in calculations
 )
 ```
@@ -325,7 +324,7 @@ Returns `FinancialAnalysis` containing:
 - ✅ User can set their current age, retirement age, and life expectancy
 - ✅ User can define multiple inflation categories with custom rates
 - ✅ User can define investment categories with pre-retirement and post-retirement XIRR
-- ✅ User can add current investments with actual XIRR
+- ✅ User can add current investments (using category's expected XIRR)
 - ✅ User can set up ongoing contributions (monthly/quarterly/yearly)
 - ✅ User can set contribution duration limits
 - ✅ User can set annual step-up percentage for contributions
@@ -391,7 +390,7 @@ Returns `FinancialAnalysis` containing:
   - UserProfile with life expectancy and monthly expenses
   - InflationCategory with defaults (general, education, health)
   - InvestmentCategory with pre/post-retirement XIRR
-  - Investment with actual XIRR and enable/disable flag
+  - Investment with category linkage and enable/disable flag
   - OngoingContribution with frequency, duration, step-up, and enable/disable flag
   - FinancialGoal with priority, timeline, and enable/disable flag
   - FinancialPlanData (container for all data)
