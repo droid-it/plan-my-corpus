@@ -484,10 +484,18 @@ fun InvestmentCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(investment.name, style = MaterialTheme.typography.titleMedium)
                     Text("Value: ₹${formatAmount(investment.currentValue)}")
-                    category?.let {
-                        Text("Expected Return: ${it.preRetirementXIRR}%",
+                    if (investment.customXIRR != null) {
+                        Text("Expected Return: ${investment.customXIRR}% (custom)",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary)
+                            color = MaterialTheme.colorScheme.tertiary)
+                    } else {
+                        category?.let {
+                            Text("Expected Return: ${it.preRetirementXIRR}%",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                    category?.let {
                         Text("Category: ${it.name}", style = MaterialTheme.typography.bodySmall)
                     }
                 }
@@ -610,6 +618,9 @@ fun InvestmentDialog(
     var value by remember { mutableStateOf(investment?.currentValue?.toString() ?: "") }
     var selectedCategoryId by remember { mutableStateOf(investment?.categoryId ?: categories.firstOrNull()?.id ?: "") }
     var expandedDropdown by remember { mutableStateOf(false) }
+    var customXirr by remember { mutableStateOf(investment?.customXIRR?.toString() ?: "") }
+    var useCustomRate by remember { mutableStateOf(investment?.customXIRR != null) }
+    var showAdvanced by remember { mutableStateOf(investment?.customXIRR != null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -689,14 +700,87 @@ fun InvestmentDialog(
                     }
                 }
 
-                // Show selected category's expected return
+                // Show expected return and optional custom rate
                 val selectedCategory = categories.find { it.id == selectedCategoryId }
-                selectedCategory?.let {
-                    Text(
-                        "Expected Return: ${it.preRetirementXIRR}% (from category)",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+
+                // Default expected return display
+                if (!useCustomRate) {
+                    selectedCategory?.let {
+                        Text(
+                            "Expected Return: ${it.preRetirementXIRR}% (from category)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                // Advanced options toggle
+                TextButton(
+                    onClick = { showAdvanced = !showAdvanced },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            if (showAdvanced) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            if (showAdvanced) "Hide Advanced Options" else "Advanced Options",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                // Advanced options content
+                if (showAdvanced) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Custom Return Rate",
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Switch(
+                                    checked = useCustomRate,
+                                    onCheckedChange = { useCustomRate = it }
+                                )
+                            }
+
+                            if (useCustomRate) {
+                                OutlinedTextField(
+                                    value = customXirr,
+                                    onValueChange = { customXirr = it },
+                                    label = { Text("Expected Return (%)") },
+                                    supportingText = { Text("Override category's default rate") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            } else {
+                                Text(
+                                    "Using ${selectedCategory?.name ?: "category"} rate: ${selectedCategory?.preRetirementXIRR ?: 0.0}%",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -704,11 +788,13 @@ fun InvestmentDialog(
             Button(
                 onClick = {
                     val valueDouble = value.toDoubleOrNull() ?: 0.0
+                    val customXirrDouble = if (useCustomRate) customXirr.toDoubleOrNull() else null
                     val newInvestment = Investment(
                         id = investment?.id ?: randomUUID(),
                         name = name,
                         currentValue = valueDouble,
                         categoryId = selectedCategoryId,
+                        customXIRR = customXirrDouble,
                         isEnabled = investment?.isEnabled ?: true
                     )
                     onSave(newInvestment)

@@ -8,5 +8,6 @@ data class Investment(
     val name: String,
     val currentValue: Double,
     val categoryId: String,
+    val customXIRR: Double? = null, // Optional: override category's expected return (null = use category default)
     val isEnabled: Boolean = true // Allow temporarily disabling without deleting
 )
