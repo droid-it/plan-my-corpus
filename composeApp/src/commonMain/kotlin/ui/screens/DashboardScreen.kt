@@ -11,8 +11,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudDownload
@@ -249,7 +249,7 @@ fun DashboardScreen(appState: AppState) {
                     )
                     IconButton(onClick = { isRetirementExpanded = !isRetirementExpanded }) {
                         Icon(
-                            imageVector = if (isRetirementExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            imageVector = if (isRetirementExpanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                             contentDescription = if (isRetirementExpanded) "Collapse" else "Expand"
                         )
                     }
