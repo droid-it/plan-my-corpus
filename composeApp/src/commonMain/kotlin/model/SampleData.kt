@@ -22,7 +22,6 @@ object SampleData {
                     name = "Public Provident Fund (PPF)",
                     currentValue = 800000.0,
                     categoryId = "debt",
-                    actualXIRR = 7.1,
                     isEnabled = true
                 ),
                 Investment(
@@ -30,7 +29,6 @@ object SampleData {
                     name = "Equity Mutual Funds",
                     currentValue = 1500000.0,
                     categoryId = "equity",
-                    actualXIRR = 13.0,
                     isEnabled = true
                 ),
                 Investment(
@@ -38,7 +36,6 @@ object SampleData {
                     name = "Employee Provident Fund (EPF)",
                     currentValue = 1200000.0,
                     categoryId = "hybrid",
-                    actualXIRR = 8.5,
                     isEnabled = true
                 )
             ),

@@ -484,11 +484,13 @@ fun InvestmentCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(investment.name, style = MaterialTheme.typography.titleMedium)
                     Text("Value: ₹${formatAmount(investment.currentValue)}")
-                    if (investment.actualXIRR != null) {
-                        Text("Actual XIRR: ${investment.actualXIRR}%")
+                    if (investment.customXIRR != null) {
+                        Text("Expected Return: ${investment.customXIRR}% (custom)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.tertiary)
                     } else {
                         category?.let {
-                            Text("Expected Return: ${it.preRetirementXIRR}% (category default)",
+                            Text("Expected Return: ${it.preRetirementXIRR}%",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary)
                         }
@@ -614,16 +616,20 @@ fun InvestmentDialog(
 ) {
     var name by remember { mutableStateOf(investment?.name ?: "") }
     var value by remember { mutableStateOf(investment?.currentValue?.toString() ?: "") }
-    var xirr by remember { mutableStateOf(investment?.actualXIRR?.toString() ?: "") }
     var selectedCategoryId by remember { mutableStateOf(investment?.categoryId ?: categories.firstOrNull()?.id ?: "") }
     var expandedDropdown by remember { mutableStateOf(false) }
-    var useCategoryDefault by remember { mutableStateOf(investment?.actualXIRR == null) }
+    var customXirr by remember { mutableStateOf(investment?.customXIRR?.toString() ?: "") }
+    var useCustomRate by remember { mutableStateOf(investment?.customXIRR != null) }
+    var showAdvanced by remember { mutableStateOf(investment?.customXIRR != null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (investment == null) "Add Current Investment" else "Edit Investment") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 // Show info card for first investment
                 if (isFirstInvestment && investment == null) {
                     Card(
@@ -697,56 +703,85 @@ fun InvestmentDialog(
                     }
                 }
 
-                // Expected return rate section
+                // Show expected return and optional custom rate
                 val selectedCategory = categories.find { it.id == selectedCategoryId }
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
+
+                // Default expected return display
+                if (!useCustomRate) {
+                    selectedCategory?.let {
+                        Text(
+                            "Expected Return: ${it.preRetirementXIRR}% (from category)",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                // Advanced options toggle
+                TextButton(
+                    onClick = { showAdvanced = !showAdvanced },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        Icon(
+                            if (showAdvanced) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            if (showAdvanced) "Hide Advanced Options" else "Advanced Options",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                // Advanced options content
+                if (showAdvanced) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text(
-                                "Expected Return Rate",
-                                style = MaterialTheme.typography.titleSmall
-                            )
                             Row(
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                             ) {
-                                Checkbox(
-                                    checked = useCategoryDefault,
-                                    onCheckedChange = { useCategoryDefault = it }
-                                )
                                 Text(
-                                    "Use category default",
-                                    style = MaterialTheme.typography.bodySmall
+                                    "Custom Return Rate",
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Switch(
+                                    checked = useCustomRate,
+                                    onCheckedChange = { useCustomRate = it }
                                 )
                             }
-                        }
 
-                        if (useCategoryDefault) {
-                            Text(
-                                "Using ${selectedCategory?.name ?: "category"} rate: ${selectedCategory?.preRetirementXIRR ?: 0.0}%",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        } else {
-                            OutlinedTextField(
-                                value = xirr,
-                                onValueChange = { xirr = it },
-                                label = { Text("Custom XIRR (%)") },
-                                supportingText = { Text("Historical return rate of this specific investment") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                            if (useCustomRate) {
+                                OutlinedTextField(
+                                    value = customXirr,
+                                    onValueChange = { customXirr = it },
+                                    label = { Text("Expected Return (%)") },
+                                    supportingText = { Text("Override category's default rate") },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            } else {
+                                Text(
+                                    "Using ${selectedCategory?.name ?: "category"} rate: ${selectedCategory?.preRetirementXIRR ?: 0.0}%",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
@@ -756,13 +791,13 @@ fun InvestmentDialog(
             Button(
                 onClick = {
                     val valueDouble = value.toDoubleOrNull() ?: 0.0
-                    val xirrDouble = if (useCategoryDefault) null else (xirr.toDoubleOrNull() ?: 0.0)
+                    val customXirrDouble = if (useCustomRate) customXirr.toDoubleOrNull() else null
                     val newInvestment = Investment(
                         id = investment?.id ?: randomUUID(),
                         name = name,
                         currentValue = valueDouble,
                         categoryId = selectedCategoryId,
-                        actualXIRR = xirrDouble,
+                        customXIRR = customXirrDouble,
                         isEnabled = investment?.isEnabled ?: true
                     )
                     onSave(newInvestment)
@@ -797,7 +832,10 @@ fun FutureLumpsumDialog(
         onDismissRequest = onDismiss,
         title = { Text(if (investment == null) "Add Future Lumpsum Investment" else "Edit Future Lumpsum") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
