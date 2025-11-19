@@ -13,10 +13,14 @@ object DefaultInvestmentCategories {
     val EQUITY = "equity"
     val DEBT = "debt"
     val HYBRID = "hybrid"
+    val REAL_ESTATE = "real-estate"
+    val GOLD = "gold"
 
     fun defaults() = listOf(
-        InvestmentCategory(EQUITY, "Equity", 12.0),
-        InvestmentCategory(DEBT, "Debt", 7.0),
-        InvestmentCategory(HYBRID, "Hybrid", 10.0)
+        InvestmentCategory(EQUITY, "Equity (Stocks/Mutual Funds)", 12.0),
+        InvestmentCategory(DEBT, "Debt (Bonds/FD)", 7.0),
+        InvestmentCategory(REAL_ESTATE, "Real Estate", 8.0),
+        InvestmentCategory(GOLD, "Gold", 6.0),
+        InvestmentCategory(HYBRID, "Mixed Portfolio", 10.0)
     )
 }

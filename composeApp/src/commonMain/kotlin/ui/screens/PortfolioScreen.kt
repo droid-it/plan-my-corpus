@@ -484,7 +484,15 @@ fun InvestmentCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(investment.name, style = MaterialTheme.typography.titleMedium)
                     Text("Value: ₹${formatAmount(investment.currentValue)}")
-                    Text("Actual XIRR: ${investment.actualXIRR}%")
+                    if (investment.actualXIRR != null) {
+                        Text("Actual XIRR: ${investment.actualXIRR}%")
+                    } else {
+                        category?.let {
+                            Text("Expected Return: ${it.preRetirementXIRR}% (category default)",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
                     category?.let {
                         Text("Category: ${it.name}", style = MaterialTheme.typography.bodySmall)
                     }
@@ -609,6 +617,7 @@ fun InvestmentDialog(
     var xirr by remember { mutableStateOf(investment?.actualXIRR?.toString() ?: "") }
     var selectedCategoryId by remember { mutableStateOf(investment?.categoryId ?: categories.firstOrNull()?.id ?: "") }
     var expandedDropdown by remember { mutableStateOf(false) }
+    var useCategoryDefault by remember { mutableStateOf(investment?.actualXIRR == null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -657,14 +666,6 @@ fun InvestmentDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                OutlinedTextField(
-                    value = xirr,
-                    onValueChange = { xirr = it },
-                    label = { Text("Actual XIRR (%)") },
-                    supportingText = { Text("Historical return rate of this specific investment") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
                 ExposedDropdownMenuBox(
                     expanded = expandedDropdown,
                     onExpandedChange = { expandedDropdown = it }
@@ -695,13 +696,67 @@ fun InvestmentDialog(
                         }
                     }
                 }
+
+                // Expected return rate section
+                val selectedCategory = categories.find { it.id == selectedCategoryId }
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Expected Return Rate",
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = useCategoryDefault,
+                                    onCheckedChange = { useCategoryDefault = it }
+                                )
+                                Text(
+                                    "Use category default",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+
+                        if (useCategoryDefault) {
+                            Text(
+                                "Using ${selectedCategory?.name ?: "category"} rate: ${selectedCategory?.preRetirementXIRR ?: 0.0}%",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            OutlinedTextField(
+                                value = xirr,
+                                onValueChange = { xirr = it },
+                                label = { Text("Custom XIRR (%)") },
+                                supportingText = { Text("Historical return rate of this specific investment") },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
             }
         },
         confirmButton = {
             Button(
                 onClick = {
                     val valueDouble = value.toDoubleOrNull() ?: 0.0
-                    val xirrDouble = xirr.toDoubleOrNull() ?: 0.0
+                    val xirrDouble = if (useCategoryDefault) null else (xirr.toDoubleOrNull() ?: 0.0)
                     val newInvestment = Investment(
                         id = investment?.id ?: randomUUID(),
                         name = name,
