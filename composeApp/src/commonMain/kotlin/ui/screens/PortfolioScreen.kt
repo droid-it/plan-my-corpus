@@ -728,7 +728,7 @@ fun InvestmentDialog(
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
                         Icon(
-                            if (showAdvanced) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            if (showAdvanced) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                             contentDescription = null,
                             modifier = Modifier.size(20.dp)
                         )
