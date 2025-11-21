@@ -275,17 +275,17 @@ class AppState {
             if (json != null) {
                 _data = Json { ignoreUnknownKeys = true }.decodeFromString<FinancialPlanData>(json)
             } else {
-                // First-time user: load sample data
-                _data = model.SampleData.createSampleFinancialData()
-                // Auto-save the sample data
+                // First-time user: start with empty data
+                _data = FinancialPlanData()
+                // Auto-save the empty state
                 autoSave()
             }
         } catch (e: Exception) {
             println("Error loading from storage: ${e.message}")
             println("Stack trace: ${e.stackTraceToString()}")
-            // Clear corrupted data and load sample data
+            // Clear corrupted data and start fresh
             PlatformStorage.clearLocalStorage()
-            _data = model.SampleData.createSampleFinancialData()
+            _data = FinancialPlanData()
             autoSave()
         }
     }
@@ -336,6 +336,17 @@ class AppState {
         } catch (e: Exception) {
             println("Error clearing data: ${e.message}")
             showSnackbar("Error: Failed to clear data")
+        }
+    }
+
+    // Load sample data to help users explore the application
+    fun loadSampleData() {
+        try {
+            data = model.SampleData.createSampleFinancialData()
+            showSnackbar("Sample data loaded successfully")
+        } catch (e: Exception) {
+            println("Error loading sample data: ${e.message}")
+            showSnackbar("Error: Failed to load sample data")
         }
     }
 

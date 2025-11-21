@@ -34,9 +34,6 @@ fun DashboardScreen(appState: AppState) {
     // Calculate current corpus (total of all current investments)
     val currentCorpus = appState.data.investments.filter { it.isEnabled }.sumOf { it.currentValue }
 
-    // Check if using sample data
-    val isSampleData = appState.data.isSampleData
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -93,9 +90,6 @@ fun DashboardScreen(appState: AppState) {
                         Text("• Set financial goals and see if you're on track", style = MaterialTheme.typography.bodyMedium)
                         Text("• Account for inflation and retirement planning", style = MaterialTheme.typography.bodyMedium)
                         Text("• All data stored locally in your browser, never sent to any server", style = MaterialTheme.typography.bodyMedium)
-                        if (isSampleData) {
-                            Text("• Sample data has been added to help you get started", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
-                        }
                     }
                 }
             }
@@ -103,6 +97,12 @@ fun DashboardScreen(appState: AppState) {
 
         // Quick Start Guide Card
         if (!appState.quickStartCardDismissed) {
+            // Check if data is completely empty
+            val isDataEmpty = appState.data.investments.isEmpty() &&
+                    appState.data.goals.isEmpty() &&
+                    appState.data.ongoingContributions.isEmpty() &&
+                    appState.data.futureLumpsumInvestments.isEmpty()
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -146,11 +146,44 @@ fun DashboardScreen(appState: AppState) {
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            "Get started with these quick actions:",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
+                        // Show Load Sample Data button if data is empty
+                        if (isDataEmpty) {
+                            Text(
+                                "Get started by:",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+
+                            Button(
+                                onClick = { appState.loadSampleData() },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.secondary
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.CloudDownload,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Load Sample Data to Explore")
+                            }
+
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                            Text(
+                                "Or start fresh with your own data:",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        } else {
+                            Text(
+                                "Quick actions:",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
