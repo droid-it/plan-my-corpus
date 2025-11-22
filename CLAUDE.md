@@ -604,6 +604,140 @@ Returns `FinancialAnalysis` containing:
   4. Implement side-by-side chart visualization
   5. Add detailed comparison tables
 
+#### 5. Goal Reminders with Fund Parking
+- [ ] **Goal**: Proactively remind users to de-risk funds as goals approach
+- [ ] **Scope**: Risk management for near-term goals
+- [ ] **Features**:
+  - Dashboard alert when goals are 1-2 years away
+  - "Time to Park Funds" notification card showing:
+    - Goal name and target date
+    - Recommended amount to move to safer investments
+    - Suggested safer category (liquid funds, FDs, debt)
+  - Parking calculator:
+    - Analyzes current portfolio allocation for this goal
+    - Calculates how much to move from equity → debt
+    - Considers market volatility and goal timeline
+  - Category migration suggestions:
+    - "Move ₹25L from Equity MF to Liquid Funds for House Down Payment (2026)"
+  - Settings to configure reminder timeline (6 months, 1 year, 2 years)
+  - One-click "Create Parking Contribution" to set up the transfer
+- [ ] **Implementation**:
+  - Add to `FinancialCalculations.kt`:
+    ```kotlin
+    data class FundParkingRecommendation(
+        val goal: FinancialGoal,
+        val monthsUntilGoal: Int,
+        val recommendedParkingAmount: Double,
+        val currentRiskyAllocation: Double,
+        val suggestedSafeCategory: InvestmentCategory,
+        val rationale: String
+    )
+
+    fun calculateFundParkingRecommendations(
+        data: FinancialPlanData,
+        currentYear: Int,
+        riskThresholdMonths: Int = 24 // Default 2 years
+    ): List<FundParkingRecommendation>
+    ```
+  - Dashboard "Upcoming Goals - Action Required" card
+  - Goals screen visual indicator (parking icon) for goals within threshold
+  - Settings screen to configure reminder timeline
+- [ ] **Benefits**: Reduces last-minute panic, protects against market downturns near goal dates
+
+#### 6. Backend-Driven Cross-Device Sync
+- [ ] **Goal**: Enable multi-device access with cloud storage
+- [ ] **Scope**: Move from localStorage to backend persistence
+- [ ] **Features**:
+  - User authentication (email/password, Google OAuth)
+  - Encrypted cloud storage for financial data
+  - Real-time sync across devices (phone, tablet, desktop)
+  - Collaborative planning:
+    - Share plan with spouse/partner (view or edit permissions)
+    - Share read-only snapshot with financial advisor
+  - Automatic versioning and backup:
+    - Cloud maintains last 30 snapshots automatically
+    - Browse and restore previous versions
+  - Conflict resolution for simultaneous edits
+  - Offline mode with sync on reconnect
+- [ ] **Technology Stack**:
+  - Backend: Kotlin backend (Ktor or Spring Boot)
+  - Database: PostgreSQL with row-level encryption
+  - Authentication: Firebase Auth or Auth0
+  - Real-time sync: WebSocket or Server-Sent Events
+  - Mobile apps: Kotlin Multiplatform Mobile (KMM) reusing all business logic
+- [ ] **Data Model Changes**:
+  ```kotlin
+  data class UserAccount(
+      val userId: String,
+      val email: String,
+      val displayName: String,
+      val createdAt: Long,
+      val lastSyncAt: Long
+  )
+
+  data class SharedAccess(
+      val sharedWithUserId: String,
+      val permission: Permission // VIEW, EDIT
+  )
+  ```
+- [ ] **Implementation Phases**:
+  1. Phase 1: Backend API and auth
+  2. Phase 2: Sync engine with conflict resolution
+  3. Phase 3: Sharing and collaboration
+  4. Phase 4: Mobile apps (Android/iOS)
+- [ ] **Benefits**: Access anywhere, family collaboration, professional advisor integration
+
+#### 7. Voice Input (AI-Driven)
+- [ ] **Goal**: Natural language interface for quick data entry
+- [ ] **Scope**: Voice-to-structured-data for all entities
+- [ ] **Features**:
+  - Voice button on each screen for quick entry
+  - Natural language understanding:
+    - "Add a goal for my daughter's education, 15 lakhs in 2035"
+    - "Increase my equity SIP by 5000 rupees"
+    - "Show me if I can retire at 55 instead of 60"
+  - Conversational queries:
+    - "How much do I need to save for retirement?"
+    - "Am I on track for my house down payment?"
+    - "What if I increase my SIP by 10%?"
+  - AI extracts structured data:
+    - Parses amounts (supports Indian numbering: "15 lakhs", "2.5 crores")
+    - Understands dates and years ("in 2035", "next year", "10 years from now")
+    - Maps to inflation/investment categories intelligently
+  - Confirmation dialog before applying changes:
+    - Shows parsed data for user review
+    - "I understood: Goal 'Daughter Education', ₹15,00,000, Year 2035, Inflation: Education (6%). Correct?"
+  - Multi-turn conversation support:
+    - User: "Add a SIP"
+    - AI: "What amount and frequency?"
+    - User: "10,000 monthly in equity"
+  - Multilingual support:
+    - Hindi, English, Hinglish
+    - Regional languages (Tamil, Telugu, Bengali, etc.)
+- [ ] **Technology Stack**:
+  - Speech-to-Text: Web Speech API or Google Cloud Speech
+  - NLP/LLM: OpenAI API or Google Gemini for intent extraction
+  - Structured output: JSON schema validation
+- [ ] **Implementation**:
+  - Add to `AppState.kt`:
+    ```kotlin
+    suspend fun processVoiceCommand(
+        transcript: String,
+        context: Screen // Current screen for context
+    ): VoiceCommandResult
+
+    data class VoiceCommandResult(
+        val understood: Boolean,
+        val action: VoiceAction?,
+        val confirmationMessage: String,
+        val parsedData: Any? // Parsed entity (Goal, Investment, etc.)
+    )
+    ```
+  - Create `ai/VoiceCommandParser.kt` with LLM integration
+  - UI: Floating voice button with visual feedback (recording, processing, success)
+  - Confirmation dialog with edit capability
+- [ ] **Benefits**: Faster data entry, accessibility, natural user experience
+
 ### Future Enhancements (Lower Priority)
 - [ ] Multi-currency support
 - [ ] Tax calculations
