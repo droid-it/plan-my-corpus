@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.TableRows
+import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -25,9 +27,15 @@ enum class FutureInvestmentType {
     RECURRING
 }
 
+enum class ViewMode {
+    EXPANDED,
+    COMPACT
+}
+
 @Composable
 fun PortfolioScreen(appState: AppState) {
     var selectedTab by remember { mutableStateOf(0) }
+    var viewMode by remember { mutableStateOf(ViewMode.EXPANDED) }
     var showAddCurrentDialog by remember { mutableStateOf(false) }
     var showFutureTypeSelector by remember { mutableStateOf(false) }
     var editingInvestment by remember { mutableStateOf<Investment?>(null) }
@@ -48,6 +56,28 @@ fun PortfolioScreen(appState: AppState) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                IconButton(
+                    onClick = { viewMode = if (viewMode == ViewMode.EXPANDED) ViewMode.COMPACT else ViewMode.EXPANDED }
+                ) {
+                    Icon(
+                        imageVector = if (viewMode == ViewMode.EXPANDED) Icons.Default.TableRows else Icons.Default.ViewAgenda,
+                        contentDescription = if (viewMode == ViewMode.EXPANDED) "Switch to Compact View" else "Switch to Expanded View"
+                    )
+                }
+                Text(
+                    text = if (viewMode == ViewMode.EXPANDED) "Expanded View" else "Compact View",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
+                )
+            }
+        }
+
         TabRow(selectedTabIndex = selectedTab) {
             Tab(
                 selected = selectedTab == 0,
@@ -64,11 +94,13 @@ fun PortfolioScreen(appState: AppState) {
         when (selectedTab) {
             0 -> CurrentPortfolioTab(
                 appState = appState,
+                viewMode = viewMode,
                 onShowAddDialog = { showAddCurrentDialog = true },
                 onEditInvestment = { editingInvestment = it }
             )
             1 -> FutureInvestmentsTab(
                 appState = appState,
+                viewMode = viewMode,
                 onShowAddDialog = { showFutureTypeSelector = true },
                 onEditFutureLumpsum = { editingFutureLumpsum = it },
                 onEditContribution = { editingContribution = it }
@@ -175,6 +207,7 @@ fun PortfolioScreen(appState: AppState) {
 @Composable
 fun CurrentPortfolioTab(
     appState: AppState,
+    viewMode: ViewMode,
     onShowAddDialog: () -> Unit,
     onEditInvestment: (Investment) -> Unit
 ) {
@@ -256,9 +289,19 @@ fun CurrentPortfolioTab(
                 )
             }
         } else {
-            appState.data.investments.forEach { investment ->
-                InvestmentCard(
-                    investment = investment,
+            if (viewMode == ViewMode.EXPANDED) {
+                appState.data.investments.forEach { investment ->
+                    InvestmentCard(
+                        investment = investment,
+                        categories = appState.data.investmentCategories,
+                        onEdit = onEditInvestment,
+                        onDelete = { appState.removeInvestment(it.id) },
+                        onToggle = { appState.toggleInvestment(it.id) }
+                    )
+                }
+            } else {
+                CurrentInvestmentsCompactView(
+                    investments = appState.data.investments,
                     categories = appState.data.investmentCategories,
                     onEdit = onEditInvestment,
                     onDelete = { appState.removeInvestment(it.id) },
@@ -272,6 +315,7 @@ fun CurrentPortfolioTab(
 @Composable
 fun FutureInvestmentsTab(
     appState: AppState,
+    viewMode: ViewMode,
     onShowAddDialog: () -> Unit,
     onEditFutureLumpsum: (FutureLumpsumInvestment) -> Unit,
     onEditContribution: (OngoingContribution) -> Unit
@@ -358,9 +402,20 @@ fun FutureInvestmentsTab(
                 )
             }
         } else {
-            appState.data.futureLumpsumInvestments.forEach { investment ->
-                FutureLumpsumCard(
-                    investment = investment,
+            if (viewMode == ViewMode.EXPANDED) {
+                appState.data.futureLumpsumInvestments.forEach { investment ->
+                    FutureLumpsumCard(
+                        investment = investment,
+                        categories = appState.data.investmentCategories,
+                        currentYear = getCurrentYear(),
+                        onEdit = onEditFutureLumpsum,
+                        onDelete = { appState.removeFutureLumpsumInvestment(it.id) },
+                        onToggle = { appState.toggleFutureLumpsumInvestment(it.id) }
+                    )
+                }
+            } else {
+                FutureLumpsumCompactView(
+                    investments = appState.data.futureLumpsumInvestments,
                     categories = appState.data.investmentCategories,
                     currentYear = getCurrentYear(),
                     onEdit = onEditFutureLumpsum,
@@ -387,14 +442,349 @@ fun FutureInvestmentsTab(
                 )
             }
         } else {
-            appState.data.ongoingContributions.forEach { contribution ->
-                ContributionCard(
-                    contribution = contribution,
+            if (viewMode == ViewMode.EXPANDED) {
+                appState.data.ongoingContributions.forEach { contribution ->
+                    ContributionCard(
+                        contribution = contribution,
+                        categories = appState.data.investmentCategories,
+                        onEdit = onEditContribution,
+                        onDelete = { appState.removeContribution(it.id) },
+                        onToggle = { appState.toggleContribution(it.id) }
+                    )
+                }
+            } else {
+                ContributionsCompactView(
+                    contributions = appState.data.ongoingContributions,
                     categories = appState.data.investmentCategories,
                     onEdit = onEditContribution,
                     onDelete = { appState.removeContribution(it.id) },
                     onToggle = { appState.toggleContribution(it.id) }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun CurrentInvestmentsCompactView(
+    investments: List<Investment>,
+    categories: List<InvestmentCategory>,
+    onEdit: (Investment) -> Unit,
+    onDelete: (Investment) -> Unit,
+    onToggle: (Investment) -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            // Header Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Name", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(2f))
+                Text("Value", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1.5f))
+                Text("Category", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1.5f))
+                Text("XIRR", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                Text("Status", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(0.8f))
+                Text("Actions", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+            }
+
+            HorizontalDivider()
+
+            // Data Rows
+            investments.forEach { investment ->
+                val category = categories.find { it.id == investment.categoryId }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .then(if (!investment.isEnabled) Modifier.alpha(0.5f) else Modifier),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = investment.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(2f)
+                    )
+
+                    Text(
+                        text = "₹${formatAmount(investment.currentValue)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1.5f)
+                    )
+
+                    Text(
+                        text = category?.name ?: "N/A",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1.5f)
+                    )
+
+                    Text(
+                        text = "${investment.customXIRR ?: category?.preRetirementXIRR ?: 0}%",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Switch(
+                        checked = investment.isEnabled,
+                        onCheckedChange = { onToggle(investment) },
+                        modifier = Modifier.weight(0.8f)
+                    )
+
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        IconButton(
+                            onClick = { onEdit(investment) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = { onDelete(investment) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (investment != investments.last()) {
+                    HorizontalDivider()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FutureLumpsumCompactView(
+    investments: List<FutureLumpsumInvestment>,
+    categories: List<InvestmentCategory>,
+    currentYear: Int,
+    onEdit: (FutureLumpsumInvestment) -> Unit,
+    onDelete: (FutureLumpsumInvestment) -> Unit,
+    onToggle: (FutureLumpsumInvestment) -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            // Header Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Name", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(2f))
+                Text("Amount", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1.5f))
+                Text("Year", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                Text("Category", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1.5f))
+                Text("Status", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(0.8f))
+                Text("Actions", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+            }
+
+            HorizontalDivider()
+
+            // Data Rows
+            investments.forEach { investment ->
+                val category = categories.find { it.id == investment.categoryId }
+                val yearsFromNow = investment.plannedYear - currentYear
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .then(if (!investment.isEnabled) Modifier.alpha(0.5f) else Modifier),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = investment.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(2f)
+                    )
+
+                    Text(
+                        text = "₹${formatAmount(investment.plannedAmount)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1.5f)
+                    )
+
+                    Text(
+                        text = "${investment.plannedYear}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Text(
+                        text = category?.name ?: "N/A",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1.5f)
+                    )
+
+                    Switch(
+                        checked = investment.isEnabled,
+                        onCheckedChange = { onToggle(investment) },
+                        modifier = Modifier.weight(0.8f)
+                    )
+
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        IconButton(
+                            onClick = { onEdit(investment) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = { onDelete(investment) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (investment != investments.last()) {
+                    HorizontalDivider()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ContributionsCompactView(
+    contributions: List<OngoingContribution>,
+    categories: List<InvestmentCategory>,
+    onEdit: (OngoingContribution) -> Unit,
+    onDelete: (OngoingContribution) -> Unit,
+    onToggle: (OngoingContribution) -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            // Header Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Name", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(2f))
+                Text("Amount", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1.2f))
+                Text("Frequency", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                Text("Duration", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                Text("Step-up", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(0.8f))
+                Text("Category", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1.2f))
+                Text("Status", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(0.8f))
+                Text("Actions", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+            }
+
+            HorizontalDivider()
+
+            // Data Rows
+            contributions.forEach { contribution ->
+                val category = categories.find { it.id == contribution.categoryId }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .then(if (!contribution.isEnabled) Modifier.alpha(0.5f) else Modifier),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = contribution.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(2f)
+                    )
+
+                    Text(
+                        text = "₹${formatAmount(contribution.amount)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1.2f)
+                    )
+
+                    Text(
+                        text = contribution.frequency.name.take(1),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Text(
+                        text = contribution.durationYears?.toString() ?: "Ret",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Text(
+                        text = "${contribution.stepUpPercentage}%",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(0.8f)
+                    )
+
+                    Text(
+                        text = category?.name ?: "N/A",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1.2f)
+                    )
+
+                    Switch(
+                        checked = contribution.isEnabled,
+                        onCheckedChange = { onToggle(contribution) },
+                        modifier = Modifier.weight(0.8f)
+                    )
+
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        IconButton(
+                            onClick = { onEdit(contribution) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = { onDelete(contribution) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (contribution != contributions.last()) {
+                    HorizontalDivider()
+                }
             }
         }
     }

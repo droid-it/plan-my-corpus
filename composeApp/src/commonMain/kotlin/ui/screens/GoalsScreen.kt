@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.TableRows
+import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,6 +22,11 @@ import randomUUID
 import ui.components.CurrencyTextField
 import getCurrentYear
 import kotlin.math.pow
+
+enum class ViewMode {
+    EXPANDED,
+    COMPACT
+}
 
 /**
  * Auto-assign timeline based on target year
@@ -37,6 +44,7 @@ private fun autoAssignTimeline(targetYear: Int, currentYear: Int): GoalTimeline 
 fun GoalsScreen(appState: AppState) {
     var showAddDialog by remember { mutableStateOf(false) }
     var editingGoal by remember { mutableStateOf<FinancialGoal?>(null) }
+    var viewMode by remember { mutableStateOf(ViewMode.EXPANDED) }
 
     // Handle auto-open from quick start guide
     LaunchedEffect(appState.shouldOpenAddGoalDialog) {
@@ -55,8 +63,24 @@ fun GoalsScreen(appState: AppState) {
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
         ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                IconButton(
+                    onClick = { viewMode = if (viewMode == ViewMode.EXPANDED) ViewMode.COMPACT else ViewMode.EXPANDED }
+                ) {
+                    Icon(
+                        imageVector = if (viewMode == ViewMode.EXPANDED) Icons.Default.TableRows else Icons.Default.ViewAgenda,
+                        contentDescription = if (viewMode == ViewMode.EXPANDED) "Switch to Compact View" else "Switch to Expanded View"
+                    )
+                }
+                Text(
+                    text = if (viewMode == ViewMode.EXPANDED) "Expanded View" else "Compact View",
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.align(androidx.compose.ui.Alignment.CenterVertically)
+                )
+            }
             FloatingActionButton(onClick = { showAddDialog = true }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Goal")
             }
@@ -115,9 +139,19 @@ fun GoalsScreen(appState: AppState) {
         if (appState.data.goals.isEmpty()) {
             Text("No goals yet. Click + to start planning your financial future!")
         } else {
-            appState.data.goals.forEach { goal ->
-                GoalCard(
-                    goal = goal,
+            if (viewMode == ViewMode.EXPANDED) {
+                appState.data.goals.forEach { goal ->
+                    GoalCard(
+                        goal = goal,
+                        inflationCategories = appState.data.inflationCategories,
+                        onEdit = { editingGoal = it },
+                        onDelete = { appState.removeGoal(it.id) },
+                        onToggle = { appState.toggleGoal(it.id) }
+                    )
+                }
+            } else {
+                GoalsCompactView(
+                    goals = appState.data.goals,
                     inflationCategories = appState.data.inflationCategories,
                     onEdit = { editingGoal = it },
                     onDelete = { appState.removeGoal(it.id) },
@@ -254,6 +288,131 @@ fun GoalCard(
                     checked = goal.isEnabled,
                     onCheckedChange = { onToggle(goal) }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun GoalsCompactView(
+    goals: List<FinancialGoal>,
+    inflationCategories: List<InflationCategory>,
+    onEdit: (FinancialGoal) -> Unit,
+    onDelete: (FinancialGoal) -> Unit,
+    onToggle: (FinancialGoal) -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            // Header Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Name", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(2f))
+                Text("Target", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1.5f))
+                Text("Year", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(0.8f))
+                Text("Priority", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                Text("Timeline", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                Text("Inflation", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                Text("Status", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(0.8f))
+                Text("Actions", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+            }
+
+            HorizontalDivider()
+
+            // Data Rows
+            goals.forEach { goal ->
+                val inflationCategory = inflationCategories.find { it.id == goal.inflationCategoryId }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .then(if (!goal.isEnabled) Modifier.alpha(0.5f) else Modifier),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    // Name
+                    Text(
+                        text = goal.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(2f)
+                    )
+
+                    // Target Amount
+                    Text(
+                        text = "₹${formatAmount(goal.targetAmount)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1.5f)
+                    )
+
+                    // Year
+                    Text(
+                        text = if (goal.isRecurring) "Recurring" else goal.targetYear.toString(),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(0.8f)
+                    )
+
+                    // Priority
+                    Text(
+                        text = goal.priority.name.take(4),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    // Timeline
+                    Text(
+                        text = goal.timeline.name.replace("_", " "),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    // Inflation Category
+                    Text(
+                        text = "${inflationCategory?.rate ?: 0}%",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    // Status (Toggle)
+                    Switch(
+                        checked = goal.isEnabled,
+                        onCheckedChange = { onToggle(goal) },
+                        modifier = Modifier.weight(0.8f)
+                    )
+
+                    // Actions
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        IconButton(
+                            onClick = { onEdit(goal) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                        IconButton(
+                            onClick = { onDelete(goal) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (goal != goals.last()) {
+                    HorizontalDivider()
+                }
             }
         }
     }
