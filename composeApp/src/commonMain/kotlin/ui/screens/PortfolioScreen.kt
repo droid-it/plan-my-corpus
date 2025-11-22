@@ -21,15 +21,11 @@ import model.*
 import randomUUID
 import getCurrentYear
 import ui.components.CurrencyTextField
+import ui.components.ViewMode
 
 enum class FutureInvestmentType {
     LUMPSUM,
     RECURRING
-}
-
-enum class ViewMode {
-    EXPANDED,
-    COMPACT
 }
 
 @Composable
