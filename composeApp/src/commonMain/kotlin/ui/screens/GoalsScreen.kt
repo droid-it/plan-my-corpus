@@ -20,13 +20,9 @@ import androidx.compose.ui.unit.dp
 import model.*
 import randomUUID
 import ui.components.CurrencyTextField
+import ui.components.ViewMode
 import getCurrentYear
 import kotlin.math.pow
-
-enum class ViewMode {
-    EXPANDED,
-    COMPACT
-}
 
 /**
  * Auto-assign timeline based on target year
