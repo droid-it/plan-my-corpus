@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Plan My Corpus</title>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CZTX381D0H"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-CZTX381D0H');
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            min-height: 100vh;
+        }
+        #ComposeTarget {
+            width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: Arial, sans-serif;
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+    </div>
+    <div id="error"></div>
+    <canvas id="ComposeTarget"></canvas>
+    <script>
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = 'Error loading application: ' + e.message;
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = 'Error loading application: ' + e.reason;
+        });
+    </script>
+    <script src="composeApp.js" onerror="document.getElementById('error').innerHTML='Failed to load composeApp.js'; document.getElementById('error').style.display='block';"></script>
+    <script>
+        // Safari keyboard scroll fix
+        (function() {
+            let focusedElement = null;
+            let keyboardHeight = 0;
+            let initialViewportHeight = window.innerHeight;
+
+            // Function to scroll element into view with proper padding
+            function scrollIntoViewIfNeeded(element) {
+                if (!element) return;
+
+                // Use requestAnimationFrame to ensure the keyboard is fully opened
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        const rect = element.getBoundingClientRect();
+                        const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                        const scrollY = window.scrollY || window.pageYOffset;
+
+                        // Calculate if element is hidden by keyboard
+                        const elementBottom = rect.bottom;
+                        const elementTop = rect.top;
+
+                        // Add padding to ensure the field is clearly visible above keyboard
+                        const padding = 100; // 100px padding above keyboard
+                        const visibleBottom = viewportHeight - padding;
+
+                        if (elementBottom > visibleBottom || elementTop < 0) {
+                            // Calculate target scroll position
+                            // We want to position the element in the middle of the visible area
+                            const targetY = rect.top + scrollY - (visibleBottom / 2) + (rect.height / 2);
+
+                            window.scrollTo({
+                                top: Math.max(0, targetY),
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 300); // Delay to let keyboard animation complete
+                });
+            }
+
+            // Listen for focus events on all input elements
+            document.addEventListener('focusin', function(e) {
+                const target = e.target;
+
+                // Check if it's an input element (Compose creates hidden inputs for text fields)
+                if (target && (
+                    target.tagName === 'INPUT' ||
+                    target.tagName === 'TEXTAREA' ||
+                    target.contentEditable === 'true'
+                )) {
+                    focusedElement = target;
+                    scrollIntoViewIfNeeded(target);
+                }
+            }, true);
+
+            // Listen for blur events
+            document.addEventListener('focusout', function(e) {
+                focusedElement = null;
+            }, true);
+
+            // Use Visual Viewport API for better keyboard detection on Safari
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', function() {
+                    const currentHeight = window.visualViewport.height;
+                    keyboardHeight = initialViewportHeight - currentHeight;
+
+                    // If keyboard is opening and we have a focused element, scroll it
+                    if (keyboardHeight > 0 && focusedElement) {
+                        scrollIntoViewIfNeeded(focusedElement);
+                    }
+                });
+
+                // Also listen for scroll events on visual viewport
+                window.visualViewport.addEventListener('scroll', function() {
+                    if (focusedElement) {
+                        // Small delay to handle Safari's scroll bounce
+                        setTimeout(() => {
+                            scrollIntoViewIfNeeded(focusedElement);
+                        }, 50);
+                    }
+                });
+            }
+
+            // Fallback for window resize (works on some browsers)
+            let lastWindowHeight = window.innerHeight;
+            window.addEventListener('resize', function() {
+                const currentHeight = window.innerHeight;
+
+                // If window height decreased significantly, keyboard likely opened
+                if (lastWindowHeight - currentHeight > 150 && focusedElement) {
+                    scrollIntoViewIfNeeded(focusedElement);
+                }
+
+                lastWindowHeight = currentHeight;
+            });
+
+            // Alternative approach: monitor input focus and scroll periodically
+            // This is a safety net for cases where other methods don't trigger
+            let scrollCheckInterval = null;
+            document.addEventListener('focusin', function(e) {
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+                    // Clear any existing interval
+                    if (scrollCheckInterval) {
+                        clearInterval(scrollCheckInterval);
+                    }
+
+                    // Check multiple times over the first second to handle keyboard animation
+                    let checks = 0;
+                    scrollCheckInterval = setInterval(() => {
+                        scrollIntoViewIfNeeded(e.target);
+                        checks++;
+                        if (checks >= 4) { // Check 4 times (at 0ms, 250ms, 500ms, 750ms)
+                            clearInterval(scrollCheckInterval);
+                            scrollCheckInterval = null;
+                        }
+                    }, 250);
+                }
+            }, true);
+
+            document.addEventListener('focusout', function() {
+                if (scrollCheckInterval) {
+                    clearInterval(scrollCheckInterval);
+                    scrollCheckInterval = null;
+                }
+            }, true);
+        })();
+    </script>
+</body>
+</html>
